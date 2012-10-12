@@ -1,0 +1,48 @@
+# depslib dependency file v1.0
+1349995047 source:/home/c/opengl/HW1/main.cpp
+	<cstdio>
+	<cstdlib>
+	<cstring>
+	<cmath>
+	<ctime>
+	<iostream>
+	<vector>
+	"gl.h"
+	"polygon.h"
+	"dataManager.h"
+
+1349680799 /home/c/opengl/HW1/mygl.h
+	<GL/glut.h>
+
+1349682057 source:/home/c/opengl/HW1/mygl.cpp
+	"mygl.h"
+	<memory.h>
+
+1349940573 /home/c/opengl/HW1/polygon.h
+	"gl.h"
+	<vector>
+
+1349940727 source:/home/c/opengl/HW1/polygon.cpp
+	"polygon.h"
+	<cmath>
+
+1349991742 source:/home/c/opengl/HW1/gl.cpp
+	"gl.h"
+	<cstring>
+	<cmath>
+
+1349992284 /home/c/opengl/HW1/gl.h
+	<GL/glut.h>
+	<iostream>
+	<cmath>
+
+1349936252 source:/home/c/opengl/HW1/dataManager.cpp
+	"dataManager.h"
+	"gl.h"
+	<fstream>
+	<iomanip>
+
+1349849084 /home/c/opengl/HW1/dataManager.h
+	<vector>
+	"polygon.h"
+
