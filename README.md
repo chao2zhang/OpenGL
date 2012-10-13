@@ -32,7 +32,9 @@ Format:corresponding to the fashion in `Syllabus`
 
 Menu(Right-Click Or Press keyboard)
 -----------------
+
 Belows are actions that take effect, they are quite self-explanatory
+
 `Next Polygon(N)`
 
 `Prev Polygon(P)`
@@ -48,7 +50,10 @@ Belows are actions that take effect, they are quite self-explanatory
 `Clip(X)`
 
 `Save(W)`
+
+
 Belows are actions that change state:
+
 `Translate By +-1(T)` #default
 
 `Rotate By +-0.01(R)`
@@ -58,8 +63,11 @@ Belows are actions that change state:
 `Viewport Size(Z)`
 
 `Viewport Position(A)`
+
 Belows are actions that switch on/off:
+
 `x10 On/Off(F)` #Ten actions in a row!
+
 `DDA/Bresenham(D)` #Default algo for rastering line is DDA
 
 Overview of program
@@ -68,9 +76,13 @@ Overview of program
 
 2. Implement a `Polygon` class
 
-3. Implement filling  using `Scanline`, boundary cases taken into consideration, `Singularity Algo`
+3. Implement filling using `Scanline`, boundary cases taken into consideration, `Singularity Algo`, see `Polygon::fill()`
 
-4. Implement 
+4. Implement translate, rotate, scale by algebra methods(faster than matrix operations and same in essence)
+
+5. Implement clipping using methos similar to `Cohen-Sutherland Line Clipping`
+
+6. Caculating centroid using diving the polygons into triangles, caculating each of them and caculating as a total.
 
 Step-by-step Instruction
 ========================
@@ -116,19 +128,13 @@ Step-by-step Instruction
 ----------------------------------
 `f ntkk nrjj nshh nrll x akk`
 
-#open x10 mode to speed up
-
-#translate the triangle by (0, 20)
-
-#rotate the quadralateral by (0.2rad)
-
-#scale the pentagon up down by 1 / (1.1 * 1.1)
-
-#rotate the quadralateral by (-0.2rad)
-
-#clip
-
-#enlarge the size of view port by (0, 20)
+Explaination:open x10 mode to speed up,
+translate the triangle by (0, 20),
+rotate the quadralateral by (0.2rad),
+scale the pentagon up down by 1 / (1.1 * 1.1),
+rotate the quadralateral by (-0.2rad),
+clip,
+enlarge the size of view port by (0, 20),
 
 5.This would generate the output image and output in `data.out`, and window would be like `output.png`
 
