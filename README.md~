@@ -184,6 +184,8 @@ Window background is black.
 Viewport background is white.
 Selected polygon is red and others are blue.
 
+Both mouse and keyboard input are avaible. Right click to show menu or press keyboard to use like VIM!
+
 Input/Output Description
 ========================
 Input: Contains a line, a right triangle, a quadrilateral, a pentagon, a hexagon.
