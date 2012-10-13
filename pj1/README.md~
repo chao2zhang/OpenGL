@@ -42,6 +42,12 @@ Belows are actions that switch on/off:
 `x10 On/Off(F)` #Ten actions in a row!
 `DDA/Bresenham(D)` #Default algo for rastering line is DDA
 
+Overview of program
+===================
+1. Implement DDA & Bresenham Algo, see `makeLineDDA()` & `makeLineBres()` in `gl.h`
+2. Implement a `Polygon` class
+3. Implement filling  using `Scanline`, boundary cases taken into consideration, `Singularity Algo`
+4. Implement
 
 Step-by-step Instruction
 ========================
@@ -94,4 +100,7 @@ Step-by-step Instruction
 #clip
 #enlarge the size of view port by (0, 20)
 5.This would generate the output image and output in `data.out`, and window would be like `output.png`
+
+Interface Description
+=====================
 

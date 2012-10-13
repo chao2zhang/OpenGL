@@ -14,6 +14,10 @@ using namespace std;
 enum MenuValue{
     MenuNext,
     MenuPrev,
+    MenuLeft,
+    MenuDown,
+    MenuUp,
+    MenuRight,
     MenuTrans,
     MenuRot,
     MenuScale,
@@ -24,6 +28,7 @@ enum MenuValue{
     MenuFast,
     MenuDb,
     MenuSave,
+    MenuComment,
 } currMenu;
 
 int menu, subMenu;
@@ -83,10 +88,10 @@ void rotFunc(unsigned char key) {
 void scaleFunc(unsigned char key) {
     switch (key) {
         case 'h':case 'j':
-            polygons[currPolygon].scale(currMode ? 1.1 : 1.01);
+            polygons[currPolygon].scale(currMode ? 0.9091 : 0.9901);
         break;
         case 'k':case 'l':
-            polygons[currPolygon].scale(currMode ? 0.9091 : 0.9901);
+            polygons[currPolygon].scale(currMode ? 1.1 : 1.01);
         break;
     }
 }
@@ -139,49 +144,6 @@ void viewportSizeFunc(unsigned char key) {
 
 void (*currTransform)(unsigned char key) = transFunc;
 
-void keyFunc(unsigned char key, int x, int y) {
-    switch (key) {
-        case 'h': case 'j': case'k': case'l':
-            currTransform(key);
-            glutPostRedisplay();
-            break;
-        case 'n':
-            nextFunc();
-            break;
-        case 'p':
-            prevFunc();
-            break;
-        case 't':
-            currTransform = transFunc;
-            break;
-        case 'r':
-            currTransform = rotFunc;
-            break;
-        case 's':
-            currTransform = scaleFunc;
-            break;
-        case 'f':
-            currMode = !currMode;
-            break;
-        case 'w':
-            manager.dump("data.out", polygons);
-            break;
-        case 'z':
-            currTransform = viewportPositionFunc;
-            break;
-        case 'a':
-            currTransform = viewportSizeFunc;
-            break;
-        case 'x':
-            for (int i = 0; i < polygons.size(); i++)
-                polygons[i].clip(GViewport);
-            break;
-        case 'd':
-            makeLine = (makeLine == makeLineDDA ? makeLineBres : makeLineDDA);
-        break;
-    }
-}
-
 void subMenuFunc(int data) {
     switch(data) {
         case MenuViewportPosition:
@@ -222,6 +184,66 @@ void menuFunc(int data) {
             break;
         case MenuSave:
             manager.dump("data.out", polygons);
+            break;
+        case MenuLeft:
+            currTransform('h');
+            glutPostRedisplay();
+            break;
+        case MenuDown:
+            currTransform('j');
+            glutPostRedisplay();
+            break;
+        case MenuUp:
+            currTransform('k');
+            glutPostRedisplay();
+            break;
+        case MenuRight:
+            currTransform('l');
+            glutPostRedisplay();
+            break;
+
+    }
+}
+
+
+void keyFunc(unsigned char key, int x, int y) {
+    switch (key) {
+        case 'h': case 'j': case'k': case'l':
+            currTransform(key);
+            glutPostRedisplay();
+            break;
+        case 'n':
+            menuFunc(MenuNext);
+            break;
+        case 'p':
+            menuFunc(MenuPrev);
+            break;
+        case 't':
+            menuFunc(MenuTrans);
+            break;
+        case 'r':
+            menuFunc(MenuRot);
+            break;
+        case 's':
+            menuFunc(MenuScale);
+            break;
+        case 'f':
+            menuFunc(MenuFast);
+            break;
+        case 'w':
+            menuFunc(MenuSave);
+            break;
+        case 'z':
+            subMenuFunc(MenuViewportPosition);
+            break;
+        case 'a':
+            subMenuFunc(MenuViewportSize);
+            break;
+        case 'x':
+            menuFunc(MenuClip);
+            break;
+        case 'd':
+            menuFunc(MenuDb);
             break;
     }
 }
@@ -271,6 +293,10 @@ int main(int argc, char** argv) {
     menu = glutCreateMenu(menuFunc);
     glutAddMenuEntry("Next Polygon(N)", MenuNext);
     glutAddMenuEntry("Prev Polygon(P)", MenuPrev);
+    glutAddMenuEntry("Left/C-Clockwise(H)", MenuLeft);
+    glutAddMenuEntry("Down/C-Clockwise(J)", MenuDown);
+    glutAddMenuEntry("Up/Clockwise(K)", MenuUp);
+    glutAddMenuEntry("Right/Clockwise(L)", MenuRight);
     glutAddMenuEntry("Translate By +-1(T)", MenuTrans);
     glutAddMenuEntry("Rotate By +-0.01(R)", MenuRot);
     glutAddMenuEntry("Scale By +-0.1(S)", MenuScale);
