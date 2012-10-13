@@ -10,6 +10,8 @@ G++ Version:`Ubuntu/Linaro 4.6.3-1ubuntu5`
 
 Github:`https://github.com/ComboZhc/OpenGL`
 
+Please README on Github, it looks better than plain text!
+
 Run using Makefile
 ------------------
 Commands:
@@ -22,6 +24,9 @@ make
 
 ./proj1
 
+
+In case it don't work, i have submitted an executive file: proj1
+
 Input/Output
 ------------
 Input filename:data.in
@@ -32,7 +37,9 @@ Format:corresponding to the fashion in `Syllabus`
 
 Menu(Right-Click Or Press keyboard)
 -----------------
+
 Belows are actions that take effect, they are quite self-explanatory
+
 `Next Polygon(N)`
 
 `Prev Polygon(P)`
@@ -43,12 +50,15 @@ Belows are actions that take effect, they are quite self-explanatory
 
 `Up/Clockwise(K)`
 
-`Right/Clockwise(L)`
+`Right/Clockwise(L)` #inspiration from VIM
 
 `Clip(X)`
 
 `Save(W)`
+
+
 Belows are actions that change state:
+
 `Translate By +-1(T)` #default
 
 `Rotate By +-0.01(R)`
@@ -58,8 +68,11 @@ Belows are actions that change state:
 `Viewport Size(Z)`
 
 `Viewport Position(A)`
+
 Belows are actions that switch on/off:
+
 `x10 On/Off(F)` #Ten actions in a row!
+
 `DDA/Bresenham(D)` #Default algo for rastering line is DDA
 
 Overview of program
@@ -68,9 +81,13 @@ Overview of program
 
 2. Implement a `Polygon` class
 
-3. Implement filling  using `Scanline`, boundary cases taken into consideration, `Singularity Algo`
+3. Implement filling using `Scanline`, boundary cases taken into consideration, `Singularity Algo`, see `Polygon::fill()`
 
-4. Implement 
+4. Implement translate, rotate, scale by algebra methods(faster than matrix operations and same in essence)
+
+5. Implement clipping using methos similar to `Cohen-Sutherland Line Clipping`, see `Polygon::clip(const Rect& view)`
+
+6. Caculating centroid using diving the polygons into triangles, caculating each of them and caculating as a total. see `Polygon::centroid()`
 
 Step-by-step Instruction
 ========================
@@ -114,24 +131,67 @@ Step-by-step Instruction
 --------------------------------------
 4.Press Keyboard in this sequence:
 ----------------------------------
-`f ntkk nrjj nshh nrll x akk`
+`f ntkk nrjj nshh nrll x akk w`
 
-#open x10 mode to speed up
-
-#translate the triangle by (0, 20)
-
-#rotate the quadralateral by (0.2rad)
-
-#scale the pentagon up down by 1 / (1.1 * 1.1)
-
-#rotate the quadralateral by (-0.2rad)
-
-#clip
-
-#enlarge the size of view port by (0, 20)
+Explaination:open x10 mode to speed up,
+translate the triangle by (0, 20),
+rotate the quadralateral by (0.2rad),
+scale the pentagon up down by 1 / (1.1 * 1.1),
+rotate the quadralateral by (-0.2rad),
+clip,
+enlarge the size of view port by (0, 20),
+save
 
 5.This would generate the output image and output in `data.out`, and window would be like `output.png`
+----------------------------------------------------------------------------------------------------
+5
+
+2
+218.6 235.0
+317.4 309.0
+
+4
+236.8 403.4
+325.0 491.0
+337.0 491.0
+336.8 402.9
+
+4
+321.3 364.9
+318.1 390.3
+387.1 377.2
+359.5 366.5
+
+5
+209.9 303.9
+169.1 348.7
+124.2 307.8
+125.4 288.7
+175.3 254.1
+
+6
+146.8 220.2
+136.8 173.8
+155.3 145.6
+165.0 192.0
+211.4 182.3
+193.2 210.3
+
 
 Interface Description
 =====================
+Window background is black.
+Viewport background is white.
+Selected polygon is red and others are blue.
+
+Both mouse and keyboard input are avaible. Right click to show menu or press keyboard to use like VIM!
+
+Input/Output Description
+========================
+Input: Contains a line, a right triangle, a quadrilateral, a pentagon, a hexagon.
+The triangle is to be clipped.
+
+Output: Contains a line, two quadrilaterals(one of them are clipped from a triangle), a pentagon, a hexagon.
+The viewport is enlarged.
+
 

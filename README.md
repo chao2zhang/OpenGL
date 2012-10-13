@@ -87,7 +87,7 @@ Overview of program
 
 5. Implement clipping using methos similar to `Cohen-Sutherland Line Clipping`, see `Polygon::clip(const Rect& view)`
 
-6. Caculating centroid using diving the polygons into triangles, caculating each of them and caculating as a total.
+6. Caculating centroid using diving the polygons into triangles, caculating each of them and caculating as a total. see `Polygon::centroid()`
 
 Step-by-step Instruction
 ========================
