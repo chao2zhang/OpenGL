@@ -22,6 +22,7 @@ enum MenuValue{
     MenuViewportSize,
     MenuViewportPosition,
     MenuFast,
+    MenuDb,
     MenuSave,
 } currMenu;
 
@@ -71,10 +72,10 @@ void transFunc(unsigned char key) {
 void rotFunc(unsigned char key) {
     switch (key) {
         case 'h':case 'j':
-            polygons[currPolygon].rotate(currMode ? 0.15 : 0.015);
+            polygons[currPolygon].rotate(currMode ? 0.1 : 0.01);
         break;
         case 'k':case 'l':
-            polygons[currPolygon].rotate(currMode ? -0.15 : -0.015);
+            polygons[currPolygon].rotate(currMode ? -0.1 : -0.01);
         break;
     }
 }
@@ -82,10 +83,10 @@ void rotFunc(unsigned char key) {
 void scaleFunc(unsigned char key) {
     switch (key) {
         case 'h':case 'j':
-            polygons[currPolygon].scale(currMode ? 1.05 : 1.025);
+            polygons[currPolygon].scale(currMode ? 1.1 : 1.01);
         break;
         case 'k':case 'l':
-            polygons[currPolygon].scale(currMode ? 0.9524 : 0.9756);
+            polygons[currPolygon].scale(currMode ? 0.9091 : 0.9901);
         break;
     }
 }
@@ -175,6 +176,9 @@ void keyFunc(unsigned char key, int x, int y) {
             for (int i = 0; i < polygons.size(); i++)
                 polygons[i].clip(GViewport);
             break;
+        case 'd':
+            makeLine = (makeLine == makeLineDDA ? makeLineBres : makeLineDDA);
+        break;
     }
 }
 
@@ -212,6 +216,9 @@ void menuFunc(int data) {
         case MenuClip:
             for (int i = 0; i < polygons.size(); i++)
                 polygons[i].clip(GViewport);
+            break;
+        case MenuDb:
+            makeLine = (makeLine == makeLineDDA ? makeLineBres : makeLineDDA);
             break;
         case MenuSave:
             manager.dump("data.out", polygons);
@@ -264,12 +271,13 @@ int main(int argc, char** argv) {
     menu = glutCreateMenu(menuFunc);
     glutAddMenuEntry("Next Polygon(N)", MenuNext);
     glutAddMenuEntry("Prev Polygon(P)", MenuPrev);
-    glutAddMenuEntry("Translate(T)", MenuTrans);
-    glutAddMenuEntry("Rotate(R)", MenuRot);
-    glutAddMenuEntry("Scale(S)", MenuScale);
+    glutAddMenuEntry("Translate By +-1(T)", MenuTrans);
+    glutAddMenuEntry("Rotate By +-0.01(R)", MenuRot);
+    glutAddMenuEntry("Scale By +-0.1(S)", MenuScale);
+    glutAddMenuEntry("x10 On/Off(F)", MenuFast);
     glutAddMenuEntry("Clip(X)", MenuClip);
     glutAddSubMenu("Viewport", subMenu);
-    glutAddMenuEntry("Fast Mode On/Off(F)", MenuFast);
+    glutAddMenuEntry("DDA/Bresenham(D)", MenuDb);
     glutAddMenuEntry("Save(W)", MenuSave);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
