@@ -10,6 +10,8 @@ G++ Version:`Ubuntu/Linaro 4.6.3-1ubuntu5`
 
 Github:`https://github.com/ComboZhc/OpenGL`
 
+Please README on Github, it looks better than plain text!
+
 Run using Makefile
 ------------------
 Commands:
