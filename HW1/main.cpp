@@ -30,9 +30,14 @@ DataManager manager;
 vector<Polygon> polygons;
 int currPolygon = 0;
 int currMode = 0;
-Color currColor = Color(0xff, 0xff, 0xff);
-Color commColor = Color(0x11, 0x22, 0xcc);
+Color currColor = Color(0xdd, 0x4b, 0x39);
+Color commColor = Color(0x9f, 0xb6, 0xcd);
 GLubyte* pixels = new GLubyte[GWindow.size() * 3];
+
+void trim(int &val, int min, int max) {
+    if (val < min) val = min;
+    if (val >= max) val = max;
+}
 
 void nextFunc() {
     currPolygon = currPolygon == polygons.size() - 1 ? 0 : currPolygon + 1;
@@ -66,10 +71,10 @@ void transFunc(unsigned char key) {
 void rotFunc(unsigned char key) {
     switch (key) {
         case 'h':case 'j':
-            polygons[currPolygon].rotate(currMode ? 0.15 : 0.03);
+            polygons[currPolygon].rotate(currMode ? 0.15 : 0.015);
         break;
         case 'k':case 'l':
-            polygons[currPolygon].rotate(currMode ? -0.15 : -0.03);
+            polygons[currPolygon].rotate(currMode ? -0.15 : -0.015);
         break;
     }
 }
@@ -83,6 +88,52 @@ void scaleFunc(unsigned char key) {
             polygons[currPolygon].scale(currMode ? 0.9524 : 0.9756);
         break;
     }
+}
+
+void viewportPositionFunc(unsigned char key) {
+    switch (key) {
+        case 'h':
+            GViewport.left -= currMode ? 10 : 1;
+            GViewport.right -= currMode ? 10 : 1;
+        break;
+        case 'j':
+            GViewport.bottom -= currMode ? 10 : 1;
+            GViewport.top -= currMode ? 10 : 1;
+        break;
+        case 'k':
+            GViewport.bottom += currMode ? 10 : 1;
+            GViewport.top += currMode ? 10 : 1;
+        break;
+        case 'l':
+            GViewport.left += currMode ? 10 : 1;
+            GViewport.right += currMode ? 10 : 1;
+        break;
+    }
+    trim(GViewport.left, 0, GWindow.width);
+    trim(GViewport.right, 0, GWindow.width);
+    trim(GViewport.bottom, 0, GWindow.height);
+    trim(GViewport.top, 0, GWindow.height);
+}
+
+void viewportSizeFunc(unsigned char key) {
+    switch (key) {
+        case 'h':
+            GViewport.right -= currMode ? 10 : 1;
+        break;
+        case 'j':
+            GViewport.top -= currMode ? 10 : 1;
+        break;
+        case 'k':
+            GViewport.top += currMode ? 10 : 1;
+        break;
+        case 'l':
+            GViewport.right += currMode ? 10 : 1;
+        break;
+    }
+    trim(GViewport.left, 0, GWindow.width);
+    trim(GViewport.right, 0, GWindow.width);
+    trim(GViewport.bottom, 0, GWindow.height);
+    trim(GViewport.top, 0, GWindow.height);
 }
 
 void (*currTransform)(unsigned char key) = transFunc;
@@ -112,7 +163,17 @@ void keyFunc(unsigned char key, int x, int y) {
             currMode = !currMode;
             break;
         case 'w':
-            manager.dump(polygons);
+            manager.dump("data.out", polygons);
+            break;
+        case 'z':
+            currTransform = viewportPositionFunc;
+            break;
+        case 'a':
+            currTransform = viewportSizeFunc;
+            break;
+        case 'x':
+            for (int i = 0; i < polygons.size(); i++)
+                polygons[i].clip(GViewport);
             break;
     }
 }
@@ -120,8 +181,10 @@ void keyFunc(unsigned char key, int x, int y) {
 void subMenuFunc(int data) {
     switch(data) {
         case MenuViewportPosition:
+            currTransform = viewportPositionFunc;
+            break;
         case MenuViewportSize:
-            currMenu = (MenuValue)data;
+            currTransform = viewportSizeFunc;
             break;
     }
 }
@@ -147,22 +210,26 @@ void menuFunc(int data) {
             currMode = !currMode;
             break;
         case MenuClip:
+            for (int i = 0; i < polygons.size(); i++)
+                polygons[i].clip(GViewport);
             break;
         case MenuSave:
-            manager.dump(polygons);
+            manager.dump("data.out", polygons);
             break;
     }
 }
 
 void display() {
-    memset(pixels, 0, GWindow.size() * 3);
+    clearPixel(pixels, GWindow.size() * 3);
     for (int i = 0; i < polygons.size(); i++) {
         if (i == currPolygon)
             makeColor(currColor);
         else
             makeColor(commColor);
         polygons[i].draw(pixels);
+        polygons[i].fill(pixels);
     }
+    projViewport(pixels);
     glDrawPixels(GWindow.width, GWindow.height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
     glutSwapBuffers();
 }
@@ -173,11 +240,13 @@ void idleFunc() {
 
 void exitFunc() {
     delete [] pixels;
-    manager.dump(polygons);
+    manager.dump("data.out", polygons);
 }
 
 int main(int argc, char** argv) {
-    manager.load(polygons);
+    manager.load("data.in", polygons);
+    makeLine = makeLineDDA;
+    makeViewport(20, 20, GWindow.width - 20, GWindow.height - 20);
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
@@ -189,10 +258,9 @@ int main(int argc, char** argv) {
     glutIdleFunc(idleFunc);
 
     subMenu = glutCreateMenu(subMenuFunc);
-    glutAddMenuEntry("Viewport Size", MenuViewportSize);
-    glutAddMenuEntry("Viewport Position", MenuViewportPosition);
+    glutAddMenuEntry("Viewport Size(Z)", MenuViewportSize);
+    glutAddMenuEntry("Viewport Position(A)", MenuViewportPosition);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
-
     menu = glutCreateMenu(menuFunc);
     glutAddMenuEntry("Next Polygon(N)", MenuNext);
     glutAddMenuEntry("Prev Polygon(P)", MenuPrev);

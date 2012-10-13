@@ -5,10 +5,8 @@
 
 using namespace std;
 
-const char FILE_NAME[] = "data.txt";
-
-void DataManager::load(vector<Polygon>& list) {
-    ifstream in(FILE_NAME);
+void DataManager::load(const char filename[], vector<Polygon>& list) {
+    ifstream in(filename);
     if (!in)
         return;
     list.clear();
@@ -27,8 +25,8 @@ void DataManager::load(vector<Polygon>& list) {
     }
     in.close();
 }
-void DataManager::dump(const vector<Polygon>& list) {
-    ofstream out(FILE_NAME);
+void DataManager::dump(const char filename[], const vector<Polygon>& list) {
+    ofstream out(filename);
     if (!out)
         return;
     out << list.size() << endl << endl;

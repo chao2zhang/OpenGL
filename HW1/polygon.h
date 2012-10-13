@@ -17,10 +17,12 @@ public:
     void push(float x, float y);
     void push(const Point& p);
     void draw(GLubyte* pixels) const;
+    void fill(GLubyte* pixels) const;
     void translate(float x, float y);
     void translate(const Point& p);
     void rotate(float a);
     void scale(float a);
+    void clip(const Rect&);
     const Point& centroid();
     const std::vector<Point>& list() const;
 };

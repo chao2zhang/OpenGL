@@ -1,11 +1,18 @@
 #include "gl.h"
 #include <cstring>
 #include <cmath>
+#include <cstdio>
 
 using namespace std;
 
 Color GColor;
 Size GWindow;
+Rect GViewport(0, 0, GWindow.width, GWindow.height);
+void (*makeLine)(int x1, int y1, int x2, int y2, GLubyte* pixels);
+
+bool Rect::inside(int x, int y) const {
+    return left <= x && x < right && bottom <= y && y < top;
+}
 
 istream& operator>>(istream& in, Point& p) {
     in >> p.x >> p.y;
@@ -17,12 +24,42 @@ ostream& operator<<(ostream& out, const Point& p) {
     return out;
 }
 
+int Point::xInt() const {
+    return round(x);
+}
+
+int Point::yInt() const {
+    return round(y);
+}
+
+Line::Line(int x0, int y0, int x1, int y1) {
+    a = y1 - y0;
+    b = x0 - x1;
+    c = - a * x0 - b * y0;
+}
+
+Line::Line(const Point& l, const Point& r) {
+    a = r.yInt() - l.yInt();
+    b = l.xInt() - r.xInt();
+    c = - a * l.xInt() - b * l.yInt();
+}
+
 float area(const Point& l, const Point& r) {
     return l.x * r.y - l.y * r.x;
 }
 
-void cleanPixel(GLubyte *pixels) {
-    memset(pixels, 0, sizeof(pixels));
+bool intersection(const Line& l, const Line& r, Point& i) {
+    float det = l.a * r.b - l.b * r.a;
+    if (abs(det) < 0.001)
+        return -1;
+    i.x = ((-l.c) * r.b - l.b * (-r.c)) / det;
+    i.y = (l.a * (-r.c) - (-l.c) * r.a) / det;
+    printf("(%.1fx+%.1fy+%.1f = 0), (%.1fx+%.1fy+%.1f = 0), (%.1f, %.1f)\n", l.a, l.b, l.c, r.a, r.b, r.c, i.x, i.y);
+    return 0;
+}
+
+void clearPixel(GLubyte *pixels, size_t size) {
+    memset(pixels, 0xff, size);
 }
 
 void makeColor(GLubyte r, GLubyte g, GLubyte b) {
@@ -36,15 +73,19 @@ void makeColor(const Color& c) {
 }
 
 void makePixel(int x, int y, GLubyte* pixels) {
-    int position = (x + y * GWindow.width) * 3;
-    if (0 <= position && position < GWindow.size() * 3) {
+    if (0 <= x && x < GWindow.width && 0 <= y && y < GWindow.height) {
+        int position = (x + y * GWindow.width) * 3;
         pixels[position] = GColor.r;
         pixels[position + 1] = GColor.g;
         pixels[position + 2] = GColor.b;
     }
 }
 
-void makeLine(int x1, int y1, int x2, int y2, GLubyte* pixels) {
+void makeLineByPoint(const Point& a, const Point& b, GLubyte *pixels) {
+    makeLine(a.xInt(), a.yInt(), b.xInt(), b.yInt(), pixels);
+}
+
+void makeLineBres(int x1, int y1, int x2, int y2, GLubyte* pixels) {
     int dx = abs(x2 - x1), dy = abs(y2 - y1);
     int s = (x2 - x1) ^ (y2 - y1);
     if (dy < dx) {
@@ -121,17 +162,10 @@ void makeLine(int x1, int y1, int x2, int y2, GLubyte* pixels) {
     }
 }
 
-void makeLine(const Point& a, const Point& b, GLubyte *pixels) {
-    makeLine(round(a.x), round(a.y), round(b.x), round(b.y), pixels);
-}
-
 void makeLineDDA(int x1, int y1, int x2, int y2, GLubyte* pixels) {
-    int dx = x2 - x1, dy = y2 - x2, steps, k;
+    int dx = x2 - x1, dy = y2 - y1;
+    int steps = abs(dx) > abs(dy) ? abs(dx) : abs(dy), k;
     float xIncr, yIncr, x = x1, y = y1;
-    if (abs(dx) > abs(dy))
-        steps = abs(dx);
-    else
-        steps = abs(dy);
     xIncr = float(dx) / float(steps);
     yIncr = float(dy) / float(steps);
     makePixel(round(x), round(y), pixels);
@@ -141,6 +175,20 @@ void makeLineDDA(int x1, int y1, int x2, int y2, GLubyte* pixels) {
     }
 }
 
-void makeLineDDA(const Point& a, const Point& b, GLubyte *pixels) {
-    makeLineDDA(round(a.x), round(a.y), round(b.x), round(b.y), pixels);
+void makeViewport(int left, int bottom, int right, int top) {
+    GViewport.left = left;
+    GViewport.bottom = bottom;
+    GViewport.right = right;
+    GViewport.top = top;
 }
+
+void projViewport(GLubyte* pixels) {
+    Color tmp = GColor;
+    makeColor(0, 0, 0);
+    for (int x = 0; x < GWindow.width; x++)
+        for (int y = 0; y < GWindow.height; y++)
+            if (!(GViewport.left <= x && x < GViewport.right && GViewport.bottom <= y && y < GViewport.top))
+                makePixel(x, y, pixels);
+    GColor = tmp;
+}
+
