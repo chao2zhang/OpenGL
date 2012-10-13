@@ -80,7 +80,7 @@ Overview of program
 
 4. Implement translate, rotate, scale by algebra methods(faster than matrix operations and same in essence)
 
-5. Implement clipping using methos similar to `Cohen-Sutherland Line Clipping`
+5. Implement clipping using methos similar to `Cohen-Sutherland Line Clipping`, see `Polygon::clip(const Rect& view)`
 
 6. Caculating centroid using diving the polygons into triangles, caculating each of them and caculating as a total.
 
@@ -137,6 +137,38 @@ clip,
 enlarge the size of view port by (0, 20),
 
 5.This would generate the output image and output in `data.out`, and window would be like `output.png`
+----------------------------------------------------------------------------------------------------
+5
+
+2
+218.6 235.0
+317.4 309.0
+
+3
+236.8 383.4
+337.3 482.8
+336.8 382.9
+
+4
+319.6 369.8
+321.5 395.3
+386.5 368.7
+357.3 363.7
+
+5
+219.1 304.5
+169.7 358.7
+115.4 309.2
+116.9 286.1
+177.2 244.2
+
+6
+141.6 216.0
+141.0 168.6
+164.7 144.6
+165.0 192.0
+212.4 191.7
+189.0 215.5
 
 Interface Description
 =====================
