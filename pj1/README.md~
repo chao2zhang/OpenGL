@@ -65,8 +65,11 @@ Belows are actions that switch on/off:
 Overview of program
 ===================
 1. Implement DDA & Bresenham Algo, see `makeLineDDA()` & `makeLineBres()` in `gl.h`
+
 2. Implement a `Polygon` class
+
 3. Implement filling  using `Scanline`, boundary cases taken into consideration, `Singularity Algo`
+
 4. Implement 
 
 Step-by-step Instruction
