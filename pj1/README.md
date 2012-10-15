@@ -10,7 +10,7 @@ G++ Version:`Ubuntu/Linaro 4.6.3-1ubuntu5`
 
 Github:`https://github.com/ComboZhc/OpenGL`
 
-Please README on Github, it looks better than plain text!
+Please README on Github, it reads better than just plain text!
 
 Run using Makefile
 ------------------
@@ -185,6 +185,8 @@ Viewport background is white.
 Selected polygon is red and others are blue.
 
 Both mouse and keyboard input are avaible. Right click to show menu or press keyboard to use like VIM!
+
+In order to improve the interaction with this program, I didn't read any number from cin(stdin) but implemented 2 kinds of action speed. While in the code, I did implement to transform/rotate/scale arbitary vector/angle.
 
 Input/Output Description
 ========================
