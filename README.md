@@ -80,7 +80,7 @@ Step-by-step Instruction
 ----------------------------------
 2.Run `proj1`, window would be like `sample_input.png`
 -----------------------------------------------
-4.Print instructions below:
+3.Print instructions below:
 ----------------------------------
 sample1.txt #open sample1.txt
 
@@ -109,7 +109,7 @@ z #normalize
 e #save and quit
 
 
-5.This would replace the file with contents like in `sample2.txt`, and window would be like `sample_output.png`
+4.This would replace the file with contents like in `sample2.txt`, and window would be like `sample_output.png`
 ------------------------------------------------------------------------------------------------------------------------------
 
 
