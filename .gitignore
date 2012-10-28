@@ -1,2 +1,5 @@
 *.md~
 *~
+*.tar.gz
+*.rar
+*.zip
