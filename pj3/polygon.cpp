@@ -136,10 +136,6 @@ const vector<Point3f>& Polygon::vertices() const {
     return _vertices;
 }
 
-const vector<Edge>& Polygon::edges() const {
-    return _edges;
-}
-
 const int Polygon::id() const {
     return _id;
 }

@@ -26,9 +26,9 @@ void DataManager::load(const char filename[], vector<Polygon>& list) {
         int e;
         in >> e;
         for (int j = 0; j < e; j++) {
-            int u, w;
-            in >> u >> w;
-            pg.addEdge2i(make_pair(u, w));
+            int u, v, w;
+            in >> u >> v >> w;
+            pg.addTriangle3i(u, v, w);
         }
         list.push_back(pg);
     }
@@ -46,10 +46,10 @@ void DataManager::dump(const char filename[], const vector<Polygon>& list) {
         for (int j = 0; j < v.size(); j++) {
             out << v[j] << endl;
         }
-        const vector<Edge>& e = list[i].edges();
-        out << e.size() << endl;
-        for (int j = 0; j < e.size(); j++) {
-            out << e[j].first << ' ' << e[j].second << endl;
+        const vector<int>& e = list[i].triangles();
+        out << e.size() / 3 << endl;
+        for (int j = 0; j < e.size() / 3; j++) {
+            out << e[j * 3] << ' ' << e[j * 3 + 1] << ' ' << e[j * 3 + 2] << endl;
         }
         out << endl;
     }

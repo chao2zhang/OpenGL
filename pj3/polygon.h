@@ -10,12 +10,11 @@
 #include "matrix.h"
 
 typedef std::vector<Point3f>::iterator ItVertex;
-typedef std::pair<int, int> Edge;
 
 class Polygon {
 private:
     std::vector<Point3f> _vertices;
-    std::vector<Edge> _edges;
+    std::vector<int> _triangles;
     Point3f _centroid;
     bool validCentroid;
     void genCentroid();
@@ -35,7 +34,6 @@ public:
     void scale(const Point3f& p, float a);
     const Point3f& centroid();
     const std::vector<Point3f>& vertices() const;
-    const std::vector<Edge>& edges() const;
     const int id() const;
     std::string toString() const;
 };
