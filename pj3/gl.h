@@ -3,8 +3,6 @@
 
 #include <GL/glut.h>
 #include "point.h"
-#include "line.h"
-#include "polygon.h"
 #include "matrix.h"
 #include "utils.h"
 

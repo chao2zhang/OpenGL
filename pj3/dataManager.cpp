@@ -2,56 +2,67 @@
 #include "gl.h"
 #include <fstream>
 #include <iomanip>
+#include <set>
+#include <algorithm>
 
 using namespace std;
 
-void DataManager::load(const char filename[], vector<Polygon>& list) {
-    list.clear();
+void DataManager::load(const char filename[],
+                     vector<Point>& points,
+                     vector<Triangle>& triangles,
+                     int& n) {
+    points.clear();
+    triangles.clear();
     ifstream in(filename);
     if (!in)
         return;
-    int n;
     in >> n;
     for (int i = 0; i < n; i++) {
-        Polygon pg(i);
-        //Read vertices
         int v;
         in >> v;
         for (int j = 0; j < v; j++) {
-            Point3f p;
-            in >> p;
-            pg.addVertex3f(p);
+            Point p;
+            in >> p.point >> p.color;
+            p.id = i;
+            points.push_back(p);
         }
-        //Read edges
-        int e;
-        in >> e;
-        for (int j = 0; j < e; j++) {
-            int u, v, w;
-            in >> u >> v >> w;
-            pg.addTriangle3i(u, v, w);
+        int t;
+        in >> t;
+        for (int j = 0; j < t; j++) {
+            Triangle t;
+            in >> t.v;
+            t.id = i;
+            triangles.push_back(t);
         }
-        list.push_back(pg);
     }
     in.close();
 }
-void DataManager::dump(const char filename[], const vector<Polygon>& list) {
+
+void DataManager::dump(const char filename[],
+                     const vector<Point>& points,
+                     const vector<Triangle>& triangles,
+                     int n) {
     ofstream out(filename);
     if (!out)
         return;
-    out << list.size() << endl << endl;
+    out << n << endl << endl;
     out << setprecision(3) << setiosflags(ios::fixed);
-    for (int i = 0; i < list.size(); i++) {
-        const vector<Point3f>& v = list[i].vertices();
-        out << v.size() << endl;
-        for (int j = 0; j < v.size(); j++) {
-            out << v[j] << endl;
-        }
-        const vector<int>& e = list[i].triangles();
-        out << e.size() / 3 << endl;
-        for (int j = 0; j < e.size() / 3; j++) {
-            out << e[j * 3] << ' ' << e[j * 3 + 1] << ' ' << e[j * 3 + 2] << endl;
-        }
+    for (int i = 0; i < n; i++) {
+        int size = 0;
+        for (int j = 0; j < points.size(); j++)
+            size += points[j].id == i;
+        out << size << endl;
+        for (int j = 0; j < points.size(); j++)
+            if (points[j].id == i)
+                out << points[j].point << ' ' << points[j].color << endl;
         out << endl;
+        size = 0;
+        for (int j = 0; j < triangles.size(); j++)
+            size += triangles[j].id == i;
+        out << size << endl;
+        for (int j = 0; j < triangles.size(); j++)
+            if (triangles[j].id == i)
+                out << triangles[j].v << endl;
     }
     out.close();
 }

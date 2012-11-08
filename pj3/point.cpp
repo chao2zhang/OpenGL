@@ -7,17 +7,27 @@ istream& operator>>(istream& in, Point2f& p) {
     return in;
 }
 
-ostream& operator<<(ostream& out, const Point2f& p) {
-    out << p.x << ' ' << p.y;
-    return out;
-}
-
 istream& operator>>(istream& in, Point3f& p) {
     in >> p.x >> p.y >> p.z;
     return in;
 }
 
+istream& operator>>(istream& in, Point3i& p) {
+    in >> p.x >> p.y >> p.z;
+    return in;
+}
+
+ostream& operator<<(ostream& out, const Point2f& p) {
+    out << p.x << ' ' << p.y;
+    return out;
+}
+
 ostream& operator<<(ostream& out, const Point3f& p) {
+    out << p.x << ' ' << p.y << ' ' << p.z;
+    return out;
+}
+
+ostream& operator<<(ostream& out, const Point3i& p) {
     out << p.x << ' ' << p.y << ' ' << p.z;
     return out;
 }
@@ -92,6 +102,18 @@ Point3f operator*(const Point3f& l, float a) {
 }
 
 Point3f operator/(const Point3f& l, float a){
+    Point3f ret = l;
+    ret /= a;
+    return ret;
+}
+
+Point3f operator*(float a, const Point3f& l) {
+    Point3f ret = l;
+    ret *= a;
+    return ret;
+}
+
+Point3f operator/(float a, const Point3f& l){
     Point3f ret = l;
     ret /= a;
     return ret;

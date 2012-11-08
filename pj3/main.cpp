@@ -6,39 +6,27 @@
 #include <iostream>
 #include <vector>
 #include "gl.h"
+#include "object.h"
 #include "dataManager.h"
 #include "console.h"
 
-const Point2i Window(880, 440);
-const Point2i SubWindow(200, 200);
-const Point2i SubWindowOffset(10, 5);
-const Point2i ConsoleWindow(420, 200);
-const Point2i ConsoleWindowOffset(10, 5);
-const Point2i TextOffset(0, 5);
-
-const int INTERVAL = 50;
-
 using namespace std;
+
+const Point2i Window(960, 660);
+const Point2i SubWindow(300, 300);
+const Point2i SubWindowOffset(10, 10);
+const Point2i ConsoleWindow(940, 300);
+const Point2i ConsoleWindowOffset(10, 10);
+const Point2i TextOffset(0, 5);
 
 int mainWindow;
 int xyWindow, yzWindow, xzWindow;
-int cabinetWindow;
-int cavalierWindow;
-int cameraWindow;
 int consoleWindow;
+
+Point3f *rotPoint1, *rotPoint2;
 
 std::string file;
 DataManager manager;
-vector<Polygon> polygons;
-int currPolygon = 0;
-int currMode = 0;
-const GLubyte currColor[] = {0xdd, 0x4b, 0x39};
-const GLubyte commColor[] = {0x9f, 0xb6, 0xcd};
-const GLubyte rotPoint1Color[] = {0xff, 0x99, 0x00};
-const GLubyte rotPoint2Color[] = {0xff, 0x33, 0x00};
-const GLubyte rotLineColor[] = {0xff, 0xcc, 0x00};
-Point3f* rotPoint1 = NULL;
-Point3f* rotPoint2 = NULL;
 
 void clearRotPoints() {
     if (rotPoint1) delete rotPoint1;
@@ -98,182 +86,48 @@ void displayMain() {
     Point2i p;
     p.x = SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
     print(GLUT_BITMAP_8_BY_13, "XY-Plane", p, Window);
-    p.x = Window.x / 4 + SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
+    p.x = Window.x / 3 + SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
     print(GLUT_BITMAP_8_BY_13, "YZ-Plane", p, Window);
-    p.x = Window.x * 2 / 4 + SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
+    p.x = Window.x * 2 / 3 + SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
     print(GLUT_BITMAP_8_BY_13, "XZ-Plane", p, Window);
-    p.x = Window.x * 3 / 4 + SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
-    print(GLUT_BITMAP_8_BY_13, "Cabinet-XY", p, Window);
-    p.x = SubWindowOffset.x; p.y = TextOffset.y;
-    print(GLUT_BITMAP_8_BY_13, "Cavalier-XY", p, Window);
-    p.x = Window.x / 4 + SubWindowOffset.x; p.y = TextOffset.y;
-    print(GLUT_BITMAP_8_BY_13, "Perspective(For Debug)", p, Window);
     glutSwapBuffers();
 }
 
 void displayXY() {
     glClear(GL_COLOR_BUFFER_BIT);
-    for (int i = 0; i < polygons.size(); i++) {
-        glColor3ubv(i == currPolygon ? currColor : commColor);
-        polygons[i].project2D(PROJ_XY, SubWindow);
-    }
-    if (rotPoint1) {
-        glColor3ubv(rotPoint1Color);
-        glBegin(GL_POINTS);
-        rotPoint1->project2D(PROJ_XY, SubWindow);
-        glEnd();
-    }
-    if (rotPoint2) {
-        glColor3ubv(rotPoint2Color);
-        glBegin(GL_POINTS);
-        rotPoint2->project2D(PROJ_XY, SubWindow);
-        glEnd();
-        glColor3ubv(rotLineColor);
-        glBegin(GL_LINES);
-            rotPoint1->project2D(PROJ_XY, SubWindow);
-            rotPoint2->project2D(PROJ_XY, SubWindow);
-        glEnd();
-    }
     glutSwapBuffers();
 }
 
 void displayYZ() {
     glClear(GL_COLOR_BUFFER_BIT);
-    for (int i = 0; i < polygons.size(); i++) {
-        glColor3ubv(i == currPolygon ? currColor : commColor);
-        polygons[i].project2D(PROJ_YZ, SubWindow);
-    }
-    if (rotPoint1) {
-        glColor3ubv(rotPoint1Color);
-        glBegin(GL_POINTS);
-        rotPoint1->project2D(PROJ_YZ, SubWindow);
-        glEnd();
-    }
-    if (rotPoint2) {
-        glColor3ubv(rotPoint2Color);
-        glBegin(GL_POINTS);
-        rotPoint2->project2D(PROJ_YZ, SubWindow);
-        glEnd();
-        glColor3ubv(rotLineColor);
-        glBegin(GL_LINES);
-            rotPoint1->project2D(PROJ_YZ, SubWindow);
-            rotPoint2->project2D(PROJ_YZ, SubWindow);
-        glEnd();
-    }
     glutSwapBuffers();
 }
 
 
 void displayXZ() {
     glClear(GL_COLOR_BUFFER_BIT);
-    for (int i = 0; i < polygons.size(); i++) {
-        glColor3ubv(i == currPolygon ? currColor : commColor);
-        polygons[i].project2D(PROJ_XZ, SubWindow);
-    }
-    if (rotPoint1) {
-        glColor3ubv(rotPoint1Color);
-        glBegin(GL_POINTS);
-        rotPoint1->project2D(PROJ_XZ, SubWindow);
-        glEnd();
-    }
-    if (rotPoint2) {
-        glColor3ubv(rotPoint2Color);
-        glBegin(GL_POINTS);
-        rotPoint2->project2D(PROJ_XZ, SubWindow);
-        glEnd();
-        glColor3ubv(rotLineColor);
-        glBegin(GL_LINES);
-            rotPoint1->project2D(PROJ_XZ, SubWindow);
-            rotPoint2->project2D(PROJ_XZ, SubWindow);
-        glEnd();
-    }
     glutSwapBuffers();
 }
 
 void displayCabinet() {
     glClear(GL_COLOR_BUFFER_BIT);
-    for (int i = 0; i < polygons.size(); i++) {
-        glColor3ubv(i == currPolygon ? currColor : commColor);
-        polygons[i].projectCabinet(SubWindow);
-    }
-    if (rotPoint1) {
-        glColor3ubv(rotPoint1Color);
-        glBegin(GL_POINTS);
-        rotPoint1->projectCabinet(SubWindow);
-        glEnd();
-    }
-    if (rotPoint2) {
-        glColor3ubv(rotPoint2Color);
-        glBegin(GL_POINTS);
-        rotPoint2->projectCabinet(SubWindow);
-        glEnd();
-        glColor3ubv(rotLineColor);
-        glBegin(GL_LINES);
-            rotPoint1->projectCabinet(SubWindow);
-            rotPoint2->projectCabinet(SubWindow);;
-        glEnd();
-    }
     glutSwapBuffers();
 }
 
 void displayCavalier() {
     glClear(GL_COLOR_BUFFER_BIT);
-    for (int i = 0; i < polygons.size(); i++) {
-        glColor3ubv(i == currPolygon ? currColor : commColor);
-        polygons[i].projectCavalier(SubWindow);
-    }
-    if (rotPoint1) {
-        glColor3ubv(rotPoint1Color);
-        glBegin(GL_POINTS);
-        rotPoint1->projectCavalier(SubWindow);
-        glEnd();
-    }
-    if (rotPoint2) {
-        glColor3ubv(rotPoint2Color);
-        glBegin(GL_POINTS);
-        rotPoint2->projectCavalier(SubWindow);
-        glEnd();
-        glColor3ubv(rotLineColor);
-        glBegin(GL_LINES);
-            rotPoint1->projectCavalier(SubWindow);
-            rotPoint2->projectCavalier(SubWindow);
-        glEnd();
-    }
     glutSwapBuffers();
 }
 
 void displayCamera() {
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
-    for (int i = 0; i < polygons.size(); i++) {
-        glColor3ubv(i == currPolygon ? currColor : commColor);
-        polygons[i].show();
-    }
-    if (rotPoint1) {
-        glColor3ubv(rotPoint1Color);
-        glBegin(GL_POINTS);
-        rotPoint1->show();
-        glEnd();
-    }
-    if (rotPoint2) {
-        glColor3ubv(rotPoint2Color);
-        glBegin(GL_POINTS);
-        rotPoint2->show();
-        glEnd();
-        glColor3ubv(rotLineColor);
-        glBegin(GL_LINES);
-            rotPoint1->show();
-            rotPoint2->show();
-        glEnd();
-    }
     glutSwapBuffers();
 }
 
 void displayConsole() {
     glClear(GL_COLOR_BUFFER_BIT);
     Point2i p(0, ConsoleWindow.y - 13);
-    if (!polygons.empty())
-        print(GLUT_BITMAP_8_BY_13, polygons[currPolygon].toString(), p, ConsoleWindow);
     print(GLUT_BITMAP_8_BY_13, hint, p, ConsoleWindow);
     print(GLUT_BITMAP_8_BY_13, hintInput, p, ConsoleWindow);
     print(GLUT_BITMAP_8_BY_13, currInput, p, ConsoleWindow);
@@ -286,10 +140,6 @@ void refreshFunc() {
     glutPostWindowRedisplay(xyWindow);
     glutPostWindowRedisplay(yzWindow);
     glutPostWindowRedisplay(xzWindow);
-    glutPostWindowRedisplay(cabinetWindow);
-    glutPostWindowRedisplay(cavalierWindow);
-    glutPostWindowRedisplay(cameraWindow);
-    glutPostWindowRedisplay(consoleWindow);
 }
 
 void keyFunc(unsigned char ch, int x, int y) {
@@ -298,21 +148,10 @@ void keyFunc(unsigned char ch, int x, int y) {
 }
 
 void exitFunc() {
-    manager.dump("data.out", polygons);
 }
 
-void prev() {
-    currPolygon = currPolygon ? currPolygon - 1 : polygons.size() - 1;
-    clearRotPoints();
-}
-
-void next() {
-    currPolygon = currPolygon == polygons.size() - 1 ? 0 : currPolygon + 1;
-    clearRotPoints();
-}
 
 void translate(const Point3f& p) {
-    polygons[currPolygon].translate(p);
     clearRotPoints();
 }
 
@@ -325,36 +164,20 @@ void rotate2(const Point3f& p1, const Point3f& p2) {
 }
 
 void rotate(const Point3f& p1, const Point3f& p2, float a) {
-    polygons[currPolygon].rotate(p1, p2, a);
 }
 
 void scale(float a) {
-    polygons[currPolygon].scale(a);
     clearRotPoints();
 }
 
 void load(const std::string& filename) {
     file = filename;
-    manager.load(filename.c_str(), polygons);
 }
 
 void save() {
-    manager.dump(file.c_str(), polygons);
 }
 
 void normalize() {
-    float best = 0.0;
-    for (int i = 0; i < polygons.size(); i++)
-        for (int j = 0; j < polygons[i].vertices().size(); j++) {
-            const Point3f& p = polygons[i].vertices()[j];
-            if (abs(p.x - 0.5) > best) best = abs(p.x - 0.5);
-            if (abs(p.y - 0.5) > best) best = abs(p.y - 0.5);
-            if (abs(p.z - 0.5) > best) best = abs(p.z - 0.5);
-        }
-    Point3f center(0.5, 0.5, 0.5);
-    for (int i = 0; i < polygons.size(); i++) {
-        polygons[i].scale(center, 0.5 / best);
-    }
 }
 
 void init(int argc, char** argv) {
@@ -363,8 +186,8 @@ void init(int argc, char** argv) {
     glutInitWindowSize(Window.x, Window.y);
     glutInitWindowPosition(100, 100);
 
-    nextCallback = next;
-    prevCallback = prev;
+    nextCallback = NULL;
+    prevCallback = NULL;
     translateCallback = translate;
     rotateCallback = rotate;
     rotate1Callback = rotate1;
@@ -394,7 +217,7 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(keyFunc);
 
     yzWindow = glutCreateSubWindow(mainWindow,
-            Window.x / 4 + SubWindowOffset.x,
+            Window.x / 3 + SubWindowOffset.x,
             SubWindowOffset.y,
             SubWindow.x,
             SubWindow.y);
@@ -403,7 +226,7 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(keyFunc);
 
     xzWindow = glutCreateSubWindow(mainWindow,
-            Window.x / 4 * 2 + SubWindowOffset.x,
+            Window.x / 3 * 2 + SubWindowOffset.x,
             SubWindowOffset.y,
             SubWindow.x,
             SubWindow.y);
@@ -411,34 +234,8 @@ int main(int argc, char** argv) {
     glutDisplayFunc(displayXZ);
     glutKeyboardFunc(keyFunc);
 
-    cabinetWindow = glutCreateSubWindow(mainWindow,
-            Window.x / 4 * 3 + SubWindowOffset.x,
-            SubWindowOffset.y,
-            SubWindow.x,
-            SubWindow.y);
-    setCabinetWindow();
-    glutDisplayFunc(displayCabinet);
-    glutKeyboardFunc(keyFunc);
-
-    cavalierWindow = glutCreateSubWindow(mainWindow,
-            SubWindowOffset.x,
-            Window.y / 2 + SubWindowOffset.y,
-            SubWindow.x,
-            SubWindow.y);
-    setCavalierWindow();
-    glutDisplayFunc(displayCavalier);
-
-    cameraWindow = glutCreateSubWindow(mainWindow,
-            Window.x / 4 + SubWindowOffset.x,
-            Window.y / 2 + SubWindowOffset.y,
-            SubWindow.x,
-            SubWindow.y);
-    setCameraWindow();
-    glutDisplayFunc(displayCamera);
-    glutKeyboardFunc(keyFunc);
-
     consoleWindow = glutCreateSubWindow(mainWindow,
-            Window.x / 2 + ConsoleWindowOffset.x,
+            ConsoleWindowOffset.x,
             Window.y / 2 + ConsoleWindowOffset.y,
             ConsoleWindow.x,
             ConsoleWindow.y);
