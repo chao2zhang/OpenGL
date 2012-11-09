@@ -12,70 +12,39 @@
 
 using namespace std;
 
-const Point2i Window(960, 660);
-const Point2i SubWindow(300, 300);
-const Point2i SubWindowOffset(10, 10);
-const Point2i ConsoleWindow(940, 300);
-const Point2i ConsoleWindowOffset(10, 10);
+#define WINDOW_SIZE 600
+
+const Point2i Window(WINDOW_SIZE, WINDOW_SIZE);
+const Point2i ConsoleWindow(580, 580);
 const Point2i TextOffset(0, 5);
 
 int mainWindow;
 int xyWindow, yzWindow, xzWindow;
 int consoleWindow;
 
+float xyCanvas[WINDOW_SIZE * WINDOW_SIZE * 3];
+float yzCanvas[WINDOW_SIZE * WINDOW_SIZE * 3];
+float xzCanvas[WINDOW_SIZE * WINDOW_SIZE * 3];
+
 Point3f *rotPoint1, *rotPoint2;
 
-std::string file;
+string file;
 DataManager manager;
 
-void clearRotPoints() {
-    if (rotPoint1) delete rotPoint1;
-    if (rotPoint2) delete rotPoint2;
-    rotPoint1 = rotPoint2 = NULL;
-}
+vector<Point> points;
+vector<Triangle> triangles;
+int n;
 
-void setMainWindow() {
+void initMainWindow() {
     glClearColor(0.8, 0.8, 0.8, 0);
     gluOrtho2D(0, Window.x, 0, Window.y);
 }
 
-void setSub() {
-    glEnable(GL_PROGRAM_POINT_SIZE);
-    glPointSize(3.0f);
-}
-
-void setSubwindow() {
-    setSub();
+void initSubWindow() {
     glClearColor(1, 1, 1, 0);
-    glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(0, SubWindow.x, 0, SubWindow.y);
 }
 
-void setCabinetWindow() {
-    setSub();
-    glClearColor(1, 1, 1, 0);
-    glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(-CABINET_INV * SubWindow.x, SubWindow.x, -CABINET_INV * SubWindow.y, SubWindow.y);
-}
-
-void setCavalierWindow() {
-    setSub();
-    glClearColor(1, 1, 1, 0);
-    glMatrixMode(GL_PROJECTION);
-    gluOrtho2D(-CAVALIER_INV * SubWindow.x, SubWindow.x, -CAVALIER_INV * SubWindow.y, SubWindow.y);
-}
-
-void setCameraWindow() {
-    setSub();
-    glClearColor(1, 1, 1, 0);
-    glMatrixMode(GL_MODELVIEW);
-    gluLookAt(1.5, -1, 2, 0.5, 0.5, 0.5, -1, 2, 5);
-    glMatrixMode(GL_PROJECTION);
-    glFrustum(-0.7, 0.7, -0.7, 0.7, 2, 4);
-}
-
-void setConsoleWindow() {
-    setSub();
+void initConsoleWindow() {
     glClearColor(0, 0, 0, 0);
     gluOrtho2D(0, ConsoleWindow.x, 0, ConsoleWindow.y);
 }
@@ -83,46 +52,75 @@ void setConsoleWindow() {
 void displayMain() {
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3b(0, 0, 0);
-    Point2i p;
-    p.x = SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
-    print(GLUT_BITMAP_8_BY_13, "XY-Plane", p, Window);
-    p.x = Window.x / 3 + SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
-    print(GLUT_BITMAP_8_BY_13, "YZ-Plane", p, Window);
-    p.x = Window.x * 2 / 3 + SubWindowOffset.x; p.y = Window.y / 2 + TextOffset.y;
-    print(GLUT_BITMAP_8_BY_13, "XZ-Plane", p, Window);
     glutSwapBuffers();
 }
 
+#define KA 0.2
+#define KD 1.5
+#define KS 3.0
+#define SP 2
+const Color3f IA(1.0, 1.0, 1.0);
+const Color3f IL(1.0, 1.0, 1.0);
+
 void displayXY() {
+    cout << ">>>>BEGIN XY-Plane" << endl;
     glClear(GL_COLOR_BUFFER_BIT);
+    normal(points, triangles, n);
+    projectOrtho(points, PLANE_XY);
+    Point3f viewPoint(0.5, 0.5, -10);//D
+    Point3f viewVector(0, 0, -1);
+    Point3f lightSource(0.5, 0.5, 0);
+    sort(points, triangles, viewPoint, viewVector);
+    light(points, KA, KD, KS, IA, IL, lightSource, viewPoint, SP);
+    triangle(points, triangles, xyCanvas, WINDOW_SIZE);
+    glDrawPixels(WINDOW_SIZE, WINDOW_SIZE, GL_RGB, GL_FLOAT, xyCanvas);
     glutSwapBuffers();
+    for (int i = 0; i < points.size(); ++i)
+        cout << points[i].toString() << endl;
+    for (int i = 0; i < triangles.size(); ++i)
+        cout << triangles[i].v << endl;
+    cout << "<<<<END XY-Plane" << endl;
 }
 
 void displayYZ() {
+    cout << ">>>>BEGIN YZ-Plane" << endl;
     glClear(GL_COLOR_BUFFER_BIT);
+    normal(points, triangles, n);
+    projectOrtho(points, PLANE_YZ);
+    Point3f viewPoint(10, 0.5, 0.5);//Right to left
+    Point3f viewVector(1, 0, 0);
+    Point3f lightSource(0.5, 0.5, 0);
+    sort(points, triangles, viewPoint, viewVector);
+    light(points, KA, KD, KS, IA, IL, lightSource, viewPoint, SP);
+    triangle(points, triangles, yzCanvas, WINDOW_SIZE);
+    glDrawPixels(WINDOW_SIZE, WINDOW_SIZE, GL_RGB, GL_FLOAT, yzCanvas);
     glutSwapBuffers();
+    for (int i = 0; i < points.size(); ++i)
+        cout << points[i].toString() << endl;
+    for (int i = 0; i < triangles.size(); ++i)
+        cout << triangles[i].v << endl;
+    cout << "<<<<END YZ-Plane" << endl;
 }
 
 
 void displayXZ() {
+    cout << ">>>>BEGIN XZ-Plane" << endl;
     glClear(GL_COLOR_BUFFER_BIT);
+    normal(points, triangles, n);
+    projectOrtho(points, PLANE_XZ);
+    Point3f viewPoint(0.5, -10, 0.5);//D
+    Point3f viewVector(0, -1, 0);
+    Point3f lightSource(0.5, 0.5, 0);
+    sort(points, triangles, viewPoint, viewVector);
+    light(points, KA, KD, KS, IA, IL, lightSource, viewPoint, SP);
+    triangle(points, triangles, xzCanvas, WINDOW_SIZE);
+    glDrawPixels(WINDOW_SIZE, WINDOW_SIZE, GL_RGB, GL_FLOAT, xzCanvas);
     glutSwapBuffers();
-}
-
-void displayCabinet() {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glutSwapBuffers();
-}
-
-void displayCavalier() {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glutSwapBuffers();
-}
-
-void displayCamera() {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glutSwapBuffers();
+    for (int i = 0; i < points.size(); ++i)
+        cout << points[i].toString() << endl;
+    for (int i = 0; i < triangles.size(); ++i)
+        cout << triangles[i].v << endl;
+    cout << "<<<<END XZ-Plane" << endl;
 }
 
 void displayConsole() {
@@ -140,6 +138,7 @@ void refreshFunc() {
     glutPostWindowRedisplay(xyWindow);
     glutPostWindowRedisplay(yzWindow);
     glutPostWindowRedisplay(xzWindow);
+    glutPostWindowRedisplay(consoleWindow);
 }
 
 void keyFunc(unsigned char ch, int x, int y) {
@@ -150,6 +149,11 @@ void keyFunc(unsigned char ch, int x, int y) {
 void exitFunc() {
 }
 
+void clearRotPoints() {
+    if (rotPoint1) delete rotPoint1;
+    if (rotPoint2) delete rotPoint2;
+    rotPoint1 = rotPoint2 = NULL;
+}
 
 void translate(const Point3f& p) {
     clearRotPoints();
@@ -172,9 +176,11 @@ void scale(float a) {
 
 void load(const std::string& filename) {
     file = filename;
+    manager.load(file.c_str(), points, triangles, n);
 }
 
 void save() {
+    manager.save(file.c_str(), points, triangles, n);
 }
 
 void normalize() {
@@ -182,6 +188,7 @@ void normalize() {
 
 void init(int argc, char** argv) {
     glutInit(&argc, argv);
+
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);
     glutInitWindowSize(Window.x, Window.y);
     glutInitWindowPosition(100, 100);
@@ -202,44 +209,31 @@ int main(int argc, char** argv) {
 
     init(argc, argv);
 
-    mainWindow = glutCreateWindow("OpenGL Project 2");
-    setMainWindow();
+    mainWindow = glutCreateWindow("OpenGL Project 3");
+    initMainWindow();
     glutDisplayFunc(displayMain);
     glutKeyboardFunc(keyFunc);
 
-    xyWindow = glutCreateSubWindow(mainWindow,
-            SubWindowOffset.x,
-            SubWindowOffset.y,
-            SubWindow.x,
-            SubWindow.y);
-    setSubwindow();
+    xyWindow = glutCreateWindow("XY-PLANE");
+    initSubWindow();
+    glutPositionWindow(200, 100);
     glutDisplayFunc(displayXY);
-    glutKeyboardFunc(keyFunc);
 
-    yzWindow = glutCreateSubWindow(mainWindow,
-            Window.x / 3 + SubWindowOffset.x,
-            SubWindowOffset.y,
-            SubWindow.x,
-            SubWindow.y);
-    setSubwindow();
+    yzWindow = glutCreateWindow("YZ-PLANE");
+    initSubWindow();
+    glutPositionWindow(300, 100);
     glutDisplayFunc(displayYZ);
-    glutKeyboardFunc(keyFunc);
 
-    xzWindow = glutCreateSubWindow(mainWindow,
-            Window.x / 3 * 2 + SubWindowOffset.x,
-            SubWindowOffset.y,
-            SubWindow.x,
-            SubWindow.y);
-    setSubwindow();
+    xzWindow = glutCreateWindow("XZ-PLANE");
+    initSubWindow();
+    glutPositionWindow(400, 100);
     glutDisplayFunc(displayXZ);
-    glutKeyboardFunc(keyFunc);
 
     consoleWindow = glutCreateSubWindow(mainWindow,
-            ConsoleWindowOffset.x,
-            Window.y / 2 + ConsoleWindowOffset.y,
+            10, 10,
             ConsoleWindow.x,
             ConsoleWindow.y);
-    setConsoleWindow();
+    initConsoleWindow();
     glutDisplayFunc(displayConsole);
 
     glutKeyboardFunc(keyFunc);

@@ -16,53 +16,61 @@ void DataManager::load(const char filename[],
     ifstream in(filename);
     if (!in)
         return;
+    int v;
+    in >> v;
+    for (int j = 0; j < v; j++) {
+        Point p;
+        in >> p.point >> p.color;
+        points.push_back(p);
+    }
+    int t;
+    in >> t;
+    for (int j = 0; j < t; j++) {
+        Triangle t;
+        in >> t.v;
+        triangles.push_back(t);
+    }
     in >> n;
-    for (int i = 0; i < n; i++) {
-        int v;
-        in >> v;
-        for (int j = 0; j < v; j++) {
-            Point p;
-            in >> p.point >> p.color;
-            p.id = i;
-            points.push_back(p);
+    for (int j = 0; j < n; j++) {
+        int c;
+        in >> c;
+        while(c--) {
+            int p;
+            in >> p;
+            points[p].id = j;
         }
-        int t;
-        in >> t;
-        for (int j = 0; j < t; j++) {
-            Triangle t;
-            in >> t.v;
-            t.id = i;
-            triangles.push_back(t);
-        }
+    }
+    for (int j = 0; j < t; j++) {
+        triangles[j].id = points[triangles[j].v.x].id;
     }
     in.close();
 }
 
-void DataManager::dump(const char filename[],
+void DataManager::save(const char filename[],
                      const vector<Point>& points,
                      const vector<Triangle>& triangles,
                      int n) {
     ofstream out(filename);
     if (!out)
         return;
-    out << n << endl << endl;
     out << setprecision(3) << setiosflags(ios::fixed);
+    out << points.size() << endl;
+    for (int j = 0; j < points.size(); j++)
+        out << points[j].point << ' ' << points[j].color << endl;
+    out << endl;
+    out << triangles.size() << endl;
+    for (int j = 0; j < triangles.size(); j++)
+        out << triangles[j].v << endl;
+    out << endl;
+    out << n << endl;
     for (int i = 0; i < n; i++) {
-        int size = 0;
+        int count = 0;
         for (int j = 0; j < points.size(); j++)
-            size += points[j].id == i;
-        out << size << endl;
+            count += points[j].id == i;
+        out << count << ' ';
         for (int j = 0; j < points.size(); j++)
-            if (points[j].id == i)
-                out << points[j].point << ' ' << points[j].color << endl;
+            if (points[j].id == i) out << j << ' ';
         out << endl;
-        size = 0;
-        for (int j = 0; j < triangles.size(); j++)
-            size += triangles[j].id == i;
-        out << size << endl;
-        for (int j = 0; j < triangles.size(); j++)
-            if (triangles[j].id == i)
-                out << triangles[j].v << endl;
     }
     out.close();
 }

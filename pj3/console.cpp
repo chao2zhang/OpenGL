@@ -16,6 +16,7 @@ void (*rotateCallback)(const Point3f& v1, const Point3f& v2, float a);
 void (*rotate1Callback)(const Point3f& v1);
 void (*rotate2Callback)(const Point3f& v1, const Point3f& v2);
 void (*scaleCallback)(float a);
+void (*lightCallback)(const Point3f& v);
 void (*nextCallback)();
 void (*prevCallback)();
 void (*loadCallback)(const string& filename);

@@ -1,3 +1,5 @@
+//#define TEST 1
+
 #ifndef POINT_H
 #define POINT_H
 
@@ -50,7 +52,6 @@ public:
     int zInt() const;
     float length() const;
     Point3f& norm();
-    void project2D(int p, const Point2i& view) const;
     void show() const;
     Point3f& operator+=(const Point3f& r);
     Point3f& operator-=(const Point3f& r);

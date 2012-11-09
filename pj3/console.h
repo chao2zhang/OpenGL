@@ -29,6 +29,7 @@ extern void (*translateCallback)(const Point3f& v);
 extern void (*rotateCallback)(const Point3f& v1, const Point3f& v2, float a);
 extern void (*rotate1Callback)(const Point3f& v1);
 extern void (*rotate2Callback)(const Point3f& v1, const Point3f& v2);
+extern void (*lightCallback)(const Point3f& v);
 extern void (*scaleCallback)(float a);
 extern void (*nextCallback)();
 extern void (*prevCallback)();

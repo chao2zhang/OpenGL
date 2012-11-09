@@ -12,7 +12,7 @@ public:
                      vector<Point>& points,
                      vector<Triangle>& triangles,
                      int& n);
-    static void dump(const char filename[],
+    static void save(const char filename[],
                      const vector<Point>& points,
                      const vector<Triangle>& triangles,
                      int n);
