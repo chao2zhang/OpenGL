@@ -11,12 +11,15 @@
 #define CABINET_INV 0.353553
 #define CAVALIER_INV 0.707107
 
-#define AXIS_X 1
-#define AXIS_Y 2
-#define AXIS_Z 4
-#define PLANE_XY 8
-#define PLANE_YZ 16
-#define PLANE_XZ 32
+#define AXIS_X 0
+#define AXIS_Y 1
+#define AXIS_Z 2
+#define PLANE_XY 10
+#define PLANE_YZ 11
+#define PLANE_XZ 12
+#define PLANE_YX 13
+#define PLANE_ZX 14
+#define PLANE_ZY 15
 
 class Point2i {
 public:
@@ -57,6 +60,7 @@ public:
     Point3f& operator-=(const Point3f& r);
     Point3f& operator*=(float a);
     Point3f& operator/=(float a);
+    std::string toString() const;
 };
 
 inline Point3f& Point3f::norm() {

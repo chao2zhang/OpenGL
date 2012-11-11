@@ -14,6 +14,8 @@ enum State{
     ROTATE_STATE_2,
     ROTATE_STATE_3,
     SCALE_STATE,
+    LIGHT_STATE,
+    PARAMETER_STATE,
 };
 
 extern State state;
@@ -36,5 +38,7 @@ extern void (*prevCallback)();
 extern void (*loadCallback)(const std::string& filename);
 extern void (*saveCallback)();
 extern void (*normalizeCallback)();
+extern void (*parameterCallback)(const std::string& parameter, const std::string& value);
+extern std::string (*getTextParameter)();
 
 #endif

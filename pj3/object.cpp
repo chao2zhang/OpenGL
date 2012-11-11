@@ -1,16 +1,98 @@
-//#define TEST 1
-
 #include "object.h"
 #include "utils.h"
+#include "matrix.h"
 #include <iostream>
 #include <string>
 
+bool grayScale = false;
+bool halfTone = true;
+Color3f iA(1, 1, 1), iL(1, 1, 1);
+float kA = 1, kD = 1, kS = 1, kK = 1;
+int pN = 3;
+float dist = 10;
+Point3f lightSource(0.5, 0.5, 1);
+
 using namespace std;
+
+Color3f maxColor(const vector<Point>& p) {
+    Color3f ret;
+    for (int i = 0; i < p.size(); i++) {
+        if (p[i].realColor.r > ret.r) ret.r = p[i].realColor.r;
+        if (p[i].realColor.g > ret.g) ret.g = p[i].realColor.g;
+        if (p[i].realColor.b > ret.b) ret.b = p[i].realColor.b;
+    }
+    return ret;
+}
+
+void translate(vector<Point>& p, const Point3f& diff, int id) {
+    for (int i = 0; i < p.size(); i++)
+        if (p[i].id == id)
+            p[i].point += diff;
+}
+
+void rotate(vector<Point>& p, const Point3f& r1, const Point3f& r2, float a, int id) {
+    Point3f u = (r2 - r1).norm();
+    float cosa = cos(a / 180 * PI);
+    float sina = sin(a / 180 * PI);
+    float onec = 1 - cosa;
+    Matrix rot(3, 3);
+    rot[0][0] = u.x * u.x * onec + cosa;
+    rot[0][1] = u.x * u.y * onec - u.z * sina;
+    rot[0][2] = u.x * u.z * onec + u.y * sina;
+    rot[1][0] = u.y * u.x * onec + u.z * sina;
+    rot[1][1] = u.y * u.y * onec + cosa;
+    rot[1][2] = u.z * u.y * onec + u.x * sina;
+    rot[2][0] = u.x * u.z * onec + u.y * sina;
+    rot[2][1] = u.y * u.z * onec - u.x * sina;
+    rot[2][2] = u.z * u.z * onec + cosa;
+    for (int i = 0; i < p.size(); i++)
+        if (p[i].id == id) {
+            Point3f t = p[i].point - r1;
+            Matrix v(3, 1);
+            v[0][0] = t.x; v[1][0] = t.y; v[2][0] = t.z;
+            Matrix r = rot * v;
+            t.x = r[0][0]; t.y = r[1][0]; t.z = r[2][0];
+            p[i].point = t + r1;
+        }
+}
+
+void scale(vector<Point>& p, float a, int id) {
+    Point3f center;
+    int count = 0;
+    for (int j = 0; j < p.size(); j++)
+        if (p[j].id == id) {
+            center += p[j].point;
+            count ++;
+        }
+    center /= count;
+    for (int j = 0; j < p.size(); j++)
+        if (p[j].id == id) {
+            p[j].point -= center;
+            p[j].point *= a;
+            p[j].point += center;
+        }
+}
+
+
+void scale(vector<Point>& p, const Point3f& center, float a) {
+    for (int j = 0; j < p.size(); j++) {
+        p[j].point -= center;
+        p[j].point *= a;
+        p[j].point += center;
+    }
+}
 
 string Point::toString() const {
     return format(
-        "Point(x=%.3f, y=%.3f, z=%.3f) Normal(x=%.3f, y=%.3f, z=%.3f) Raster(x=%.3f, y=%.3f) Color(r=%.3f, g=%.3f, b=%.3f) RealColor(r=%.3f, g=%.3f, b=%.3f)",
-        point.x, point.y, point.z, normal.x, normal.y, normal.z, raster.x, raster.y, color.r, color.g, color.b, realColor.r, realColor.g, realColor.b
+        "Point(%.3f, %.3f, %.3f) Normal(%.3f, %.3f, %.3f) Color(%.3f, %.3f, %.3f) RealColor(%.3f, %.3f, %.3f)",
+        point.x, point.y, point.z, normal.x, normal.y, normal.z, color.r, color.g, color.b, realColor.r, realColor.g, realColor.b
+    );
+}
+
+string Triangle::toString() const {
+    return format(
+        "(%d, %d, %d)",
+        v.x, v.y, v.z
     );
 }
 
@@ -24,6 +106,15 @@ void projectOrtho(Point& p, int option) {
         break;
     case PLANE_XZ:
         p.raster = Point2f(p.point.x, p.point.z);
+        break;
+    case PLANE_YX:
+        p.raster = Point2f(p.point.y, p.point.x);
+        break;
+    case PLANE_ZX:
+        p.raster = Point2f(p.point.z, p.point.x);
+        break;
+    case PLANE_ZY:
+        p.raster = Point2f(p.point.z, p.point.y);
         break;
     }
 }
@@ -55,7 +146,6 @@ void normal(vector<Point>& p, const vector<Triangle>& t, int n) {
                 count ++;
             }
         center /= count;
-        cout << "Center:" << center << endl;
         for (int j = 0; j < p.size(); j++)
             if (p[j].id == i) {
                 p[j].normal = Point3f();
@@ -81,29 +171,32 @@ void sort(const vector<Point>& p, vector<Triangle>& t, const Point3f& ref, const
                 swap(t[i], t[j]);
 }
 
-void light(Point& p, float ka, float kd, float ks, const Color3f& iA, const Color3f& iL, const Point3f& lum, const Point3f& ref, int sp) {
-    Color3f ratio = iA * ka;
+void light(Point& p, const Point3f& lum, const Point3f& ref) {
+    Color3f ratio = iA * kA;
     Point3f l = (lum - p.point).norm();
     Point3f v = (ref - p.point).norm();
     Point3f r = (2 * p.normal * dot(p.normal, l) - l).norm();
-    cout << "Point:" << p.point << " View:" << v << " Lum:" << l << " Reflect:" << r << endl;
-    float a = kd * dot(l, p.normal);
+    //cout << "Point:" << p.point << " View:" << v << " Lum:" << l << " Reflect:" << r << endl;
+    float a = kD * dot(l, p.normal);
     if (a < 0) a = 0;
     float b = dot(r, v);
-    if (b < 0) b = 0;
-    b = pow(b, sp);
-    b *= ks;
-    float c = 1 / ((ref - p.point).length() + (lum - p.point).length());
+    if (b < 0) b = 0; b = pow(b, pN); b *= kS;
+    float c = 1 / ((ref - p.point).length() + kK * (lum - p.point).length());
     ratio += iL * c * (a + b);
-    cout << "a:" << a << " b:" << b << endl;
     p.realColor.r = p.color.r * ratio.r;
     p.realColor.g = p.color.g * ratio.g;
     p.realColor.b = p.color.b * ratio.b;
 }
 
-void light(vector<Point>& p, float ka, float kd, float ks, const Color3f& iA, const Color3f& iL, const Point3f& lum, const Point3f& ref, int sp) {
+void light(vector<Point>& p, const Point3f& lum, const Point3f& ref) {
     for (int i = 0; i < p.size(); i++)
-        light(p[i], ka, kd, ks, iA, iL, lum, ref, sp);
+        light(p[i], lum, ref);
+    Color3f c = maxColor(p);
+    for (int i = 0; i < p.size(); i++) {
+        p[i].realColor.r /= c.r;
+        p[i].realColor.g /= c.g;
+        p[i].realColor.b /= c.b;
+    }
 }
 
 template <class T>
@@ -122,40 +215,73 @@ void makePixel(int x, int y, const Color3f& c, GLfloat *pixels, int ppl) {
     }
 }
 
-void testPixel(int x, int y, const Color3f& c, GLfloat *pixels, int ppl) {
-    makePixel(x, y, c, pixels, ppl);
-    makePixel(x+1, y, c, pixels, ppl);
-    makePixel(x-1, y, c, pixels, ppl);
-    makePixel(x, y+1, c, pixels, ppl);
-    makePixel(x+1, y+1, c, pixels, ppl);
-    makePixel(x-1, y+1, c, pixels, ppl);
-    makePixel(x, y-1, c, pixels, ppl);
-    makePixel(x+1, y-1, c, pixels, ppl);
-    makePixel(x-1, y-1, c, pixels, ppl);
-}
-
 void pixel(int x, int y, const Color3f& c, GLfloat *pixels, int ppl) {
-    vector<Color3f> v;
-    float m = (c.r > c.g ? (c.r > c.b ? c.r : c.b) : (c.g > c.b ? c.g : c.b));
-    int countBlack = ceil(9 - 9 * m);
-    int countRed = ceil(c.r / (c.r + c.g + c.b) * (9 * m));
-    int countGreen = ceil(c.g / (c.r + c.g + c.b) * (9 * m));
-    int countBlue = ceil(c.b / (c.r + c.g + c.b) * (9 * m));
-    while(countBlack--) v.push_back(Color3f(0, 0, 0));
-    while(countRed--) v.push_back(Color3f(1, 0, 0));
-    while(countGreen--) v.push_back(Color3f(0, 1, 0));
-    while(countBlue--) v.push_back(Color3f(0, 0, 1));
-    srand(x * ppl + y);
-    randomize(v);
-    makePixel(x, y, v[0], pixels, ppl);
-    makePixel(x+1, y, v[1], pixels, ppl);
-    makePixel(x-1, y, v[2], pixels, ppl);
-    makePixel(x, y+1, v[3], pixels, ppl);
-    makePixel(x+1, y+1, v[4], pixels, ppl);
-    makePixel(x-1, y+1, v[5], pixels, ppl);
-    makePixel(x, y-1, v[6], pixels, ppl);
-    makePixel(x+1, y-1, v[7], pixels, ppl);
-    makePixel(x-1, y-1, v[8], pixels, ppl);
+    if (halfTone) {
+        if (grayScale) {
+            vector<Color3f> v;
+            float m = c.gray().r;
+            int countBlack = ceil(9 - 9 * m);
+            int countWhite = ceil(9 * m);
+            while(countBlack--) v.push_back(Color3f(0, 0, 0));
+            while(countWhite--) v.push_back(Color3f(1, 1, 1));
+            srand(x * ppl + y);
+            randomize(v);
+            makePixel(x, y, v[0], pixels, ppl);
+            makePixel(x+1, y, v[1], pixels, ppl);
+            makePixel(x-1, y, v[2], pixels, ppl);
+            makePixel(x, y+1, v[3], pixels, ppl);
+            makePixel(x+1, y+1, v[4], pixels, ppl);
+            makePixel(x-1, y+1, v[5], pixels, ppl);
+            makePixel(x, y-1, v[6], pixels, ppl);
+            makePixel(x+1, y-1, v[7], pixels, ppl);
+            makePixel(x-1, y-1, v[8], pixels, ppl);
+        } else {
+            vector<Color3f> v;
+            float m = (c.r > c.g ? (c.r > c.b ? c.r : c.b) : (c.g > c.b ? c.g : c.b));
+            int countBlack = ceil(9 - 9 * m);
+            int countRed = ceil(c.r / (c.r + c.g + c.b) * (9 * m));
+            int countGreen = ceil(c.g / (c.r + c.g + c.b) * (9 * m));
+            int countBlue = ceil(c.b / (c.r + c.g + c.b) * (9 * m));
+            while(countBlack--) v.push_back(Color3f(0, 0, 0));
+            while(countRed--) v.push_back(Color3f(1, 0, 0));
+            while(countGreen--) v.push_back(Color3f(0, 1, 0));
+            while(countBlue--) v.push_back(Color3f(0, 0, 1));
+            srand(x * ppl + y);
+            randomize(v);
+            makePixel(x, y, v[0], pixels, ppl);
+            makePixel(x+1, y, v[1], pixels, ppl);
+            makePixel(x-1, y, v[2], pixels, ppl);
+            makePixel(x, y+1, v[3], pixels, ppl);
+            makePixel(x+1, y+1, v[4], pixels, ppl);
+            makePixel(x-1, y+1, v[5], pixels, ppl);
+            makePixel(x, y-1, v[6], pixels, ppl);
+            makePixel(x+1, y-1, v[7], pixels, ppl);
+            makePixel(x-1, y-1, v[8], pixels, ppl);
+        }
+    } else {
+        if (grayScale) {
+            Color3f g = c.gray();
+            makePixel(x, y, g, pixels, ppl);
+            makePixel(x+1, y, g, pixels, ppl);
+            makePixel(x-1, y, g, pixels, ppl);
+            makePixel(x, y+1, g, pixels, ppl);
+            makePixel(x+1, y+1, g, pixels, ppl);
+            makePixel(x-1, y+1, g, pixels, ppl);
+            makePixel(x, y-1, g, pixels, ppl);
+            makePixel(x+1, y-1, g, pixels, ppl);
+            makePixel(x-1, y-1, g, pixels, ppl);
+        } else {
+            makePixel(x, y, c, pixels, ppl);
+            makePixel(x+1, y, c, pixels, ppl);
+            makePixel(x-1, y, c, pixels, ppl);
+            makePixel(x, y+1, c, pixels, ppl);
+            makePixel(x+1, y+1, c, pixels, ppl);
+            makePixel(x-1, y+1, c, pixels, ppl);
+            makePixel(x, y-1, c, pixels, ppl);
+            makePixel(x+1, y-1, c, pixels, ppl);
+            makePixel(x-1, y-1, c, pixels, ppl);
+        }
+    }
 }
 
 #define SX(e) round(e.raster.x * ppl / 3)
@@ -173,11 +299,7 @@ void line(const Point& a, const Point& b, GLfloat* pixels, int ppl) {
     float y = SY(a);
     Color3f c = a.realColor;
     for (int k = 0; k <= steps; k++) {
-        #ifndef TEST
         pixel(T(round(x)), T(round(y)), c, pixels, ppl);
-        #else
-        testPixel(T(round(x)), T(round(y)), c, pixels, ppl);
-        #endif
         x += xIncr; y += yIncr; c += cIncr;
     }
 }
@@ -193,11 +315,7 @@ void horizontalLine(int begX, int endX, int y, const Color3f& begC, const Color3
     Color3f c = begC;
     int x = begX;
     for (int k = 0; k <= steps; k++) {
-        #ifndef TEST
         pixel(T(x), T(y), c, pixels, ppl);
-        #else
-        testPixel(T(x), T(y), c, pixels, ppl);
-        #endif
         x += xIncr; c += cIncr;
     }
 }
@@ -254,13 +372,18 @@ void triangle(const Point& a, const Point& b, const Point& c, GLfloat* pixels, i
 #undef SY
 #undef T
 
-string toString(const vector<Point>& p, const vector<Triangle>& t, int num) {
+string toString(const vector<Point>& p, const vector<Triangle>& t, int curr) {
     string ret;
-    ret += format("Object #%d:\n", num);
+    ret += format("Object #%d:\n", curr);
     for (int i = 0; i < p.size(); i++)
-        ret += format("Point #%d = (%.3f, %.3f, %.3f);", i, p[i].point.x, p[i].point.y, p[i].point.z);
+        if (p[i].id == curr) {
+            ret += format("\tVertex #%d = %s\n", i, p[i].toString().c_str());
+        }
     ret += "\n";
-    for (int i = 0; i < p.size(); i++)
-        ret += format("Triangle #%d = (%.3f, %.3f, %.3f);", i, t[i].v.x, t[i].v.y, t[i].v.z);
+    for (int i = 0; i < t.size(); i++)
+        if (t[i].id == curr) {
+            ret += format("\tTriangle #%d = %s\n", i, t[i].toString().c_str());
+        }
     ret += "\n";
+    return ret;
 }

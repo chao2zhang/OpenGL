@@ -1,18 +1,19 @@
 # depslib dependency file v1.0
-1352360298 source:/home/c/opengl/PJ3/color.cpp
+1352659707 source:/home/c/opengl/PJ3/color.cpp
 	"color.h"
+	"utils.h"
 
-1352360292 /home/c/opengl/PJ3/color.h
+1352659601 /home/c/opengl/PJ3/color.h
 	<iostream>
 
-1352411824 source:/home/c/opengl/PJ3/console.cpp
+1352658544 source:/home/c/opengl/PJ3/console.cpp
 	"console.h"
 	"hint.h"
 	<string>
 	<vector>
 	<sstream>
 
-1352411820 /home/c/opengl/PJ3/console.h
+1352658504 /home/c/opengl/PJ3/console.h
 	"gl.h"
 	<string>
 	<vector>
@@ -24,7 +25,7 @@
 	"matrix.h"
 	"utils.h"
 
-1352448298 /home/c/opengl/PJ3/point.h
+1352659561 /home/c/opengl/PJ3/point.h
 	<GL/glut.h>
 	<cmath>
 	<iostream>
@@ -35,7 +36,7 @@
 	<string>
 	"point.h"
 
-1352448582 /home/c/opengl/PJ3/hint.h
+1352659868 /home/c/opengl/PJ3/hint.h
 
 1352407136 source:/home/c/opengl/PJ3/dataManager.cpp
 	"dataManager.h"
@@ -49,12 +50,12 @@
 	<vector>
 	"object.h"
 
-1352448054 /home/c/opengl/PJ3/object.h
+1352674707 /home/c/opengl/PJ3/object.h
 	"point.h"
 	"color.h"
 	<vector>
 
-1352442337 source:/home/c/opengl/PJ3/main.cpp
+1352662273 source:/home/c/opengl/PJ3/main.cpp
 	<cstdio>
 	<cstdlib>
 	<cstring>
@@ -62,6 +63,7 @@
 	<ctime>
 	<iostream>
 	<vector>
+	"hint.h"
 	"gl.h"
 	"object.h"
 	"dataManager.h"
@@ -79,12 +81,14 @@
 	<cstdio>
 	<cstdarg>
 
-1352448032 source:/home/c/opengl/PJ3/object.cpp
+1352662710 source:/home/c/opengl/PJ3/object.cpp
 	"object.h"
 	"utils.h"
+	"matrix.h"
 	<iostream>
 	<string>
 
-1352360525 source:/home/c/opengl/PJ3/point.cpp
+1352659725 source:/home/c/opengl/PJ3/point.cpp
 	"point.h"
+	"utils.h"
 

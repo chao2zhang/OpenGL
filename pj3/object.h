@@ -7,6 +7,14 @@
 
 using namespace std;
 
+extern bool grayScale;
+extern bool halfTone;
+extern Color3f iA, iL;
+extern float kA, kD, kS, kK;
+extern int pN;
+extern float dist;
+extern Point3f lightSource;
+
 class Point {
 public:
     Point3f point;
@@ -29,14 +37,21 @@ public:
 public:
     Triangle():id(0), depth(0){}
     Triangle(const Point3i& vv, int idd):v(vv), id(idd), depth(0){}
+    string toString() const;
 };
+
+void translate(vector<Point>& p, const Point3f& diff, int id);
+void rotate(vector<Point>& p, const Point3f& r1, const Point3f& r2, float a, int id);
+void scale(vector<Point>& p, float a, int id);
+void scale(vector<Point>& p, const Point3f& center, float a);
+
 void projectOrtho(Point& p, int option);
 void projectOrtho(vector<Point>& p, int option);
 void depth(const vector<Point>& p, vector<Triangle>& t, const Point3f& r, const Point3f& v);
 void normal(vector<Point>& p, const vector<Triangle>& t, int n);
 void sort(const vector<Point>& p, vector<Triangle>& t, const Point3f& ref, const Point3f& view);
-void light(Point& p, float ka, float kd, float ks, const Color3f& iA, const Color3f& iL, const Point3f& lum, const Point3f& ref, int sp);
-void light(vector<Point>& p, float ka, float kd, float ks, const Color3f& iA, const Color3f& iL, const Point3f& lum, const Point3f& ref, int sp);
+void light(Point& p, const Point3f& lum, const Point3f& ref);
+void light(vector<Point>& p, const Point3f& lum, const Point3f& ref);
 template <class T> void randomize(vector<T>& v);
 void makePixel(int x, int y, const Color3f& c, GLfloat *pixels, int ppl);
 void pixel(int x, int y, const Color3f& c, GLfloat *pixels, int ppl);

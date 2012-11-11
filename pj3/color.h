@@ -14,6 +14,8 @@ public:
     Color3f& operator-=(const Color3f& rhs);
     Color3f& operator*=(float a);
     Color3f& operator/=(float a);
+    Color3f gray() const;
+    string toString() const;
 };
 
 Color3f operator+(const Color3f& l, const Color3f& rhs);

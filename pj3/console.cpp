@@ -16,12 +16,15 @@ void (*rotateCallback)(const Point3f& v1, const Point3f& v2, float a);
 void (*rotate1Callback)(const Point3f& v1);
 void (*rotate2Callback)(const Point3f& v1, const Point3f& v2);
 void (*scaleCallback)(float a);
-void (*lightCallback)(const Point3f& v);
 void (*nextCallback)();
 void (*prevCallback)();
+void (*normalizeCallback)();
+void (*lightCallback)(const Point3f& v);
+
 void (*loadCallback)(const string& filename);
 void (*saveCallback)();
-void (*normalizeCallback)();
+void (*parameterCallback)(const string& parameter, const string& value);
+string (*getTextParameter)();
 
 static Point3f translateVector;
 static Point3f rotatePoint1;
@@ -46,6 +49,9 @@ void inputCharacter(unsigned char c) {
 static void setState(State st) {
     state = st;
     switch(st) {
+        case PARAMETER_STATE:
+            hintInput = TEXT_PARAMETER;
+        break;
         case FILE_STATE:
             hintInput = TEXT_FILENAME;
         break;
@@ -79,6 +85,9 @@ void updateState() {
         } else if (state == WAIT_STATE) {
             char ch = currInput[0];
             switch(ch) {
+                case 'm': case 'M':
+                    setState(PARAMETER_STATE);
+                    break;
                 case 't': case 'T':
                     setState(TRANSLATE_STATE);
                     break;
@@ -130,7 +139,18 @@ void updateState() {
             if (scaleCallback)
                 scaleCallback(scaleRatio);
             setState(WAIT_STATE);
+        } else if (state == PARAMETER_STATE) {
+            int pos;
+            string param, value;
+            if ((pos = currInput.find('=')) != -1) {
+                param = currInput.substr(0, pos);
+                value = currInput.substr(pos + 1, currInput.size() - pos - 1);
+                if (parameterCallback)
+                    parameterCallback(param, value);
+            }
+            setState(WAIT_STATE);
         }
         currInput.clear();
     }
+    cout << "STATE: " << state << endl;
 }

@@ -1,4 +1,5 @@
 #include "point.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -54,6 +55,10 @@ int Point3f::zInt() const {
 
 float Point3f::length() const {
     return sqrt(x*x + y*y + z*z);
+}
+
+string Point3f::toString() const {
+    return format("%.3f %.3f %.3f", x, y, z);
 }
 
 Point3f& Point3f::operator+=(const Point3f& r) {

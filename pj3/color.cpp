@@ -1,4 +1,5 @@
 #include "color.h"
+#include "utils.h"
 
 Color3f& Color3f::operator+=(const Color3f& rhs) {
     r += rhs.r;
@@ -52,6 +53,9 @@ Color3f operator/(const Color3f& l, float a){
     return ret;
 }
 
+string Color3f::toString() const {
+    return format("%.3f %.3f %.3f", r, g, b);
+}
 
 istream& operator>>(istream& in, Color3f& p) {
     in >> p.r >> p.g >> p.b;
@@ -60,4 +64,9 @@ istream& operator>>(istream& in, Color3f& p) {
 ostream& operator<<(ostream& out, const Color3f& p) {
     out << p.r << ' ' << p.g << ' ' << p.b;
     return out;
+}
+
+Color3f Color3f::gray() const {
+    float gray = 0.299*r + 0.587*g + 0.114*b;
+    return Color3f(gray, gray, gray);
 }
