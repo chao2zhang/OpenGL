@@ -84,6 +84,17 @@ Para(M)eter
 
 Please follow the instructions(esp. with a valid file) 
 
+Options
+=======
+
+1. `g` whether display a colored imaged or a grayscale image
+
+2. `h` whether half-toning or not
+
+3. `dist` distance between viewpoint and center of the object box
+
+4. `ka`, `kd`, `ks`, `k`(Replace K with K|l-p|), `ia`, `il`, `n`
+
 Overview of program
 ===================
 1. Implement a camera-like orthogonal projection
