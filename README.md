@@ -84,8 +84,8 @@ Para(M)eter
 
 Please follow the instructions(esp. with a valid file) 
 
-Options
-=======
+Parameters
+==========
 
 1. `g` whether display a colored imaged or a grayscale image
 
@@ -94,6 +94,8 @@ Options
 3. `dist` distance between viewpoint and center of the object box
 
 4. `ka`, `kd`, `ks`, `k`(Replace K with K|l-p|), `ia`, `il`, `n`
+
+5. Input: first input `m` for setting parameter, then input assignment like `g=0` or `ka=1 1 1` to set parameters
 
 Overview of program
 ===================
@@ -146,6 +148,10 @@ s #scale
 1.5 #scale ratio
 
 z #normalize
+
+m #parameter
+
+n=4 #set N in Phong-lighting model
 
 e #save
 
