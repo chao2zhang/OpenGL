@@ -157,17 +157,17 @@ void displayBottom() {
 }
 
 string textParameter() {
-    return format("g=%d h=%d l=%s dist=%.3f ka=%.3f kd=%.3f ks=%.3f k=%.3f ia=%s il=%s n=%d",
+    return format("g=%d h=%d l=%s dist=%.3f ka=%s kd=%s ks=%s k=%.3f ia=%.3f il=%.3f n=%d",
         grayScale,
         halfTone,
         lightSource.toString().c_str(),
         dist,
-        kA,
-        kD,
-        kS,
+        kA.toString().c_str(),
+        kD.toString().c_str(),
+        kS.toString().c_str(),
         kK,
-        iA.toString().c_str(),
-        iL.toString().c_str(),
+        iA,
+        iL,
         pN);
 }
 

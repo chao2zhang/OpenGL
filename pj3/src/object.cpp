@@ -6,8 +6,8 @@
 
 bool grayScale = false;
 bool halfTone = true;
-Color3f iA(1, 1, 1), iL(1, 1, 1);
-float kA = 1, kD = 1, kS = 1, kK = 1;
+float iA = 0.2, iL = 1, kK = 1;
+Point3f kA(1, 1, 1), kD(1, 1, 1), kS(1, 1, 1);
 int pN = 3;
 float dist = 10;
 Point3f lightSource(0.5, 0.5, 1);
@@ -172,20 +172,24 @@ void sort(const vector<Point>& p, vector<Triangle>& t, const Point3f& ref, const
 }
 
 void light(Point& p, const Point3f& lum, const Point3f& ref) {
-    Color3f ratio = iA * kA;
+    Point3f ratio = kA * iA;
     Point3f l = (lum - p.point).norm();
     Point3f v = (ref - p.point).norm();
     Point3f r = (2 * p.normal * dot(p.normal, l) - l).norm();
     //cout << "Point:" << p.point << " View:" << v << " Lum:" << l << " Reflect:" << r << endl;
-    float a = kD * dot(l, p.normal);
-    if (a < 0) a = 0;
-    float b = dot(r, v);
-    if (b < 0) b = 0; b = pow(b, pN); b *= kS;
+    Point3f a = dot(l, p.normal) * kD;
+    if (a.x < 0) a.x = 0;
+    if (a.y < 0) a.y = 0;
+    if (a.z < 0) a.z = 0;
+    Point3f b = dot(r, v) * kS;
+    if (b.x < 0) b.x = 0; b.x = pow(b.x, pN);
+    if (b.y < 0) b.y = 0; b.y = pow(b.y, pN);
+    if (b.z < 0) b.z = 0; b.z = pow(b.z, pN);
     float c = 1 / ((ref - p.point).length() + kK * (lum - p.point).length());
     ratio += iL * c * (a + b);
-    p.realColor.r = p.color.r * ratio.r;
-    p.realColor.g = p.color.g * ratio.g;
-    p.realColor.b = p.color.b * ratio.b;
+    p.realColor.r = p.color.r * ratio.x;
+    p.realColor.g = p.color.g * ratio.y;
+    p.realColor.b = p.color.b * ratio.z;
 }
 
 void light(vector<Point>& p, const Point3f& lum, const Point3f& ref) {

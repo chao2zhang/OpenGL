@@ -9,8 +9,8 @@ using namespace std;
 
 extern bool grayScale;
 extern bool halfTone;
-extern Color3f iA, iL;
-extern float kA, kD, kS, kK;
+extern float iA, iL, kK;
+extern Point3f kA, kD, kS;
 extern int pN;
 extern float dist;
 extern Point3f lightSource;
