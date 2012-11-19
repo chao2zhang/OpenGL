@@ -1,0 +1,25 @@
+# depslib dependency file v1.0
+1353290518 source:/home/c/opengl/PJ4/curve.cpp
+	"curve.h"
+	<iostream>
+	<stdexcept>
+	<GL/glut.h>
+
+1353287498 /home/c/opengl/PJ4/curve.h
+	"point.h"
+	<vector>
+
+1353043376 /home/c/opengl/PJ4/point.h
+
+1353290600 source:/home/c/opengl/PJ4/main.cpp
+	<iostream>
+	<vector>
+	<GL/glut.h>
+	<GL/glu.h>
+	"point.h"
+	"curve.h"
+
+1353049712 source:/home/c/opengl/PJ4/point.cpp
+	"point.h"
+	<cmath>
+
