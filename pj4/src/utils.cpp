@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <typeinfo>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdio>
 #include <GL/glut.h>
@@ -244,6 +245,7 @@ void load(vector<Curve*>& curves) {
 
 void save(const vector<Curve*>& curves) {
     ofstream out(FILENAME);
+    out << setiosflags(ios::fixed) << setprecision(3);
     out << curves.size() << endl << endl;
     for (int i = 0; i < curves.size(); i++) {
         if (curves[i]->name() == BSPLINE_NAME) {
@@ -256,6 +258,7 @@ void save(const vector<Curve*>& curves) {
             Curve* c = curves[i];
             out << c->size() << ' ' << 0 << endl;
             for (int i = 0; i < c->size(); i++) {out << c->get(i).x << ' ' << c->get(i).y << endl;}
+            out << endl;
         }
     }
 }

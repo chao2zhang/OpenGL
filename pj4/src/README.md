@@ -1,4 +1,4 @@
-Project 3 For ECS 175
+Project 4 For ECS 175
 =====================
 Zhang, Chao
 -----------
@@ -29,7 +29,7 @@ In case it doesn't work, I have submitted an executive file: proj4
 
 Input/Output
 ------------
-Filename:User specified.
+Filename:`data.txt`
 
 Format:
 
@@ -82,90 +82,63 @@ Load(L) #load from `data.txt`
 
 Save(S) #save to `data.txt`
 
-Parameters
-==========
-
-1. `g` whether display a colored imaged or a grayscale image
-
-2. `h` whether half-toning or not
-
-3. `dist` distance between viewpoint and center of the object box
-
-4. `ka`, `kd`, `ks`, `k`(Replace K with K|l-p|), `ia`, `il`, `n`
-
-5. Input: first input `m` for setting parameter, then input assignment like `g=0` or `ka=1 1 1` to set parameters
-
 Overview of program
 ===================
-1. Implement a camera-like orthogonal projection
+1. Implement Bezier Curve
 
-2. Implement Phong-light model(replace constant `K` with `k||l-p||`)
+2. Implement Bspline Curve
 
-3. Implement Gouraud shading.
+3. Implement `Rubber band` technique to allow users to interactively specify a point.
 
-4. Implement Half-toning(WITH AND WITHOUT COLOR!)
-
-5. Implement Painter's algorithm
-
-6. Translate, Rotate(using Quaternion methods), Scale(by centroid), Normalize, see `translate()`, `rotate()`, `scale()` and so on.
-
-**For normalization, (Xmin, Xmax, Ymin, Ymax, Zmin, Zmax) would be scaled to (0, 1, 0, 1, 0, 1) centered at (0.5, 0.5, 0.5)
-
-7. Data abstractions:Point, Color, Matrix are all C++ classes
-
-8. A more friendly user interface. Draw a console window using `glRaster2D` and `glutBitmapCharacter`
+4. Data abstractions:Curve, Bezier, Bspline, Point2f are all C++ classes
 
 Step-by-step Instruction
 ========================
-1.Edit input file`s.txt` to specify polygons and polyhedras
+1.Edit input file `data.txt` to specify curves like those in `data_in.txt`
 
-2.Run `proj3`, the output(7 windows in total) would be like `sample_input.png`
+2.Run `proj4`, the screen would be like `input.png`
 
 3.Print instructions below:
 
-s.txt #open s.txt
+x #next curve
 
-t #translate
+`left click` on the second last knot, type `8.500` and `Enter`
 
-0 0.2 0 #translate vector
+r #remove the 1st point in the 2nd curve
 
-n #next
+`right click` on any area of main window, choose `curve->remove current curve`
 
-r #rotate
+m #modify the point
 
-0.5 0.5 0.2 #first point on rotate axis
+`left click` on any specific point to modify current point
 
-0.5 0.5 0.8 #second point on rotate axis
+`right click` on any area of main window, choose `curve->add bezier`
 
-30 #rotate angle in degree(direction:counter-clockwise to axis from first to second)
+x #next curve
 
-n #next
+x #next curve
 
-s #scale
+a and `left click` #add a new point
 
-1.5 #scale ratio
+a and `left click` #add a new point
 
-z #normalize
+a and `left click` #add a new point
 
-m #parameter
+a and `left click` #add a new point
 
-n=4 #set N in Phong-lighting model
+s #save
 
-e #save
-
-q #quit
-
-4.This would replace the file with contents like in `sout.txt`, and window would be like `sample_output.png`
+4.This would replace the file with contents like in `data_out.txt`, and the windows would be like `output.png`
 
 Interface Description
 =====================
-1 Window for command and display parameters.
-6 Windows for showing objects from FRONT/BACK/LEFT/RIGHT/TOP/DOWN.
+1 Window for displaying curves and information about current curve and current point.
+
+1 Window for displaying and manipulating knots.
 
 Input/Output Description
 ========================
-Input: Contains a triangle, a tetrahedron and a dodecahedron.
+Input: Contains two Bspline curves and two Bezier curves.
 
-Input: Contains a triangle, a tetrahedron and a dodecahedron. Each object is normalized.
-
+Input: Contains one Bspline curve and three Bezier curves.
 

@@ -73,7 +73,7 @@ void displayFunc() {
             glRasterPos2f(0, 0);
             const Point2f& p = curves[curId]->get(curPoint);
             char buf[50];
-            sprintf(buf, "Bezier #%d Point #%d=(%.3f, %.3f) K=%d", curId, curPoint, p.x, p.y, dynamic_cast<Bspline*>(curves[curId])->getK());
+            sprintf(buf, "Bspline #%d Point #%d=(%.3f, %.3f) K=%d", curId, curPoint, p.x, p.y, dynamic_cast<Bspline*>(curves[curId])->getK());
             print(GLUT_BITMAP_9_BY_15, buf);
         }
     }
@@ -139,8 +139,8 @@ int main(int argc, char** argv) {
     glutAddSubMenu("Curve", menuId);
     glutAddSubMenu("Point", menuPoint);
     glutAddSubMenu("B-spline", menuBspline);
-    glutAddMenuEntry("Load(L)", 1);
-    glutAddMenuEntry("Save(S)", 2);
+    glutAddMenuEntry("Load(l)", 1);
+    glutAddMenuEntry("Save(s)", 2);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     glutInitWindowSize(KnotWindow.x, KnotWindow.y);
