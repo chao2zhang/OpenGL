@@ -39,6 +39,8 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="point.cpp" />
 		<Unit filename="point.h" />
+		<Unit filename="utils.cpp" />
+		<Unit filename="utils.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
