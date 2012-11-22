@@ -22,6 +22,7 @@ const int NORMAL_STATE = 0;
 extern int knotPos;
 extern bool knotInput;
 extern string knotString;
+#define FILENAME "data.txt"
 
 void refreshFunc();
 void setInputState();
@@ -38,8 +39,10 @@ void menuBsplineFunc(int menu);
 void keyFunc(unsigned char ch, int x, int y);
 void keyKnotFunc(unsigned char ch, int x, int y);
 void print(void* format, const string& str);
-void print(void* format, char str[]);
+void print(void* format, const char str[]);
 void print(void* format, int num);
 void print(void* format, float num);
 float getFloat(const string& str);
+void load(vector<Curve*>& curves);
+void save(const vector<Curve*>& curves);
 #endif

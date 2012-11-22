@@ -90,7 +90,7 @@ void Bspline::addKnot() {
 }
 
 void Bspline::setK(int vk) {
-    if (2 <= vk && vk <= points.size()) {
+    if ((2 <= vk && vk <= points.size()) || points.size() < 2) {
         float delta;
         while (k < vk) {
             addKnot();
@@ -148,18 +148,9 @@ void Bspline::show(float u) const {
         for (int i = 0; i < last.size() - 1; i++) {
             int leftIndex = bigI - k + i + r + 2;
             int rightIndex = bigI + 1 + i;
-            try {
-            float left = knots.at(leftIndex);
-            float right = knots.at(rightIndex);
+            float left = knots[leftIndex];
+            float right = knots[rightIndex];
             now.push_back(((right - u) * last[i] + (u - left) * last[i+1]) / (right - left));
-            } catch (exception e) {
-                cout << "u=" << u << endl;
-                for (int i = 0; i < knots.size(); i++)
-                    cout << knots[i] << ' ';
-                cout << endl;
-                cout << bigI << ' ' << knots.size() << ' ' << leftIndex << ' ' << rightIndex << endl;
-                return;
-            }
         }
     }
     glVertex2f(now.front().x, now.front().y);

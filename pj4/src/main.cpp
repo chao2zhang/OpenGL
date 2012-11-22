@@ -56,22 +56,20 @@ void displayFunc() {
             glVertex2f(inputPoint.x, inputPoint.y);
         }
     glEnd();
-
-
     if (curves.size()) {
         for (int j = 0; j < curves[curId]->size(); j++) {
             const Point2f& p = curves[curId]->get(j);
             glRasterPos2f(p.x - float(4)/float(WINDOW_SIZE), p.y + float(15)/float(WINDOW_SIZE));
             print(GLUT_BITMAP_9_BY_15, j);
         }
-        if (curves[curId]->name() == "Bezier") {
+        if (curves[curId]->name() == BEZIER_NAME && curves[curId]->size()) {
             glRasterPos2f(0, 0);
             const Point2f& p = curves[curId]->get(curPoint);
             char buf[50];
             sprintf(buf, "Bezier #%d Point #%d=(%.3f, %.3f)", curId, curPoint, p.x, p.y);
             print(GLUT_BITMAP_9_BY_15, buf);
         }
-        if (curves[curId]->name() == "Bspline") {
+        if (curves[curId]->name() == BSPLINE_NAME && curves[curId]->size()) {
             glRasterPos2f(0, 0);
             const Point2f& p = curves[curId]->get(curPoint);
             char buf[50];
@@ -114,25 +112,13 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(100, 100);
     window = glutCreateWindow("OpenGL Project 4");
     initWindow();
-    curves.push_back(new Bezier());
-    curves.back()->add(Point2f(0.3, 0.3));
-    curves.back()->add(Point2f(0.5, 0.5));
-    curves.back()->add(Point2f(0.3, 0.5));
-    curves.push_back(new Bspline());
-    curves.back()->add(Point2f(0.4, 0.6));
-    curves.back()->add(Point2f(0.48, 0.70));
-    curves.back()->add(Point2f(0.50, 0.73));
-    curves.back()->add(Point2f(0.54, 0.76));
-    curves.back()->add(Point2f(0.60, 0.64));
-    ((Bspline*)curves.back())->setK(4);
-
     glutDisplayFunc(displayFunc);
     glutKeyboardFunc(keyFunc);
     glutMouseFunc(mouseFunc);
     glutPassiveMotionFunc(motionFunc);
     menuId = glutCreateMenu(menuIdFunc);
-    glutAddMenuEntry("Next Curve", 1);
-    glutAddMenuEntry("Prev Curve", 2);
+    glutAddMenuEntry("Next Curve(x)", 1);
+    glutAddMenuEntry("Prev Curve(v)", 2);
     glutAddMenuEntry("Add Bezier", 3);
     glutAddMenuEntry("Add Bspline", 4);
     glutAddMenuEntry("Remove Current Curve", 5);
@@ -153,7 +139,8 @@ int main(int argc, char** argv) {
     glutAddSubMenu("Curve", menuId);
     glutAddSubMenu("Point", menuPoint);
     glutAddSubMenu("B-spline", menuBspline);
-    glutAddMenuEntry("Save", 1);
+    glutAddMenuEntry("Load(L)", 1);
+    glutAddMenuEntry("Save(S)", 2);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     glutInitWindowSize(KnotWindow.x, KnotWindow.y);
@@ -163,6 +150,9 @@ int main(int argc, char** argv) {
     glutDisplayFunc(displayKnotFunc);
     glutMouseFunc(mouseKnotFunc);
     glutKeyboardFunc(keyKnotFunc);
+
+    load(curves);
+
     glutMainLoop();
     return 0;
 }

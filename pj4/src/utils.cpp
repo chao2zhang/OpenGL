@@ -1,6 +1,7 @@
 #include "utils.h"
 #include <typeinfo>
 #include <iostream>
+#include <fstream>
 #include <cstdio>
 #include <GL/glut.h>
 
@@ -47,7 +48,7 @@ void mouseFunc(int button, int mstate, int x, int y) {
 
 void mouseKnotFunc(int button, int mstate, int x, int y) {
     if (button == GLUT_LEFT_BUTTON && mstate == GLUT_DOWN) {
-        if (curves[curId]->name() == "Bspline") {
+        if (curves[curId]->name() == BSPLINE_NAME) {
             Bspline* b = dynamic_cast<Bspline*>(curves[curId]);
             knotPos = y / 15 - 1;
             if (0 <= knotPos && knotPos < b->knotSize()) {
@@ -103,6 +104,14 @@ void menuPointFunc(int menu) {
 }
 
 void menuFunc(int menu) {
+    switch (menu) {
+    case 1:
+        load(curves);
+        break;
+    case 2:
+        save(curves);
+        break;
+    }
 }
 
 void menuIdFunc(int menu) {
@@ -124,7 +133,9 @@ void menuIdFunc(int menu) {
         curves.push_back(new Bspline());
     break;
     case 5:
-        //curves.erase(curId);
+        Curve* curve = curves[curId];
+        curves.erase(curves.begin() + curId);
+        delete curve;
     break;
     }
     refreshFunc();
@@ -133,11 +144,11 @@ void menuIdFunc(int menu) {
 void menuBsplineFunc(int menu) {
     switch (menu) {
     case 1:
-        if (curves[curId]->name() == "Bspline")
+        if (curves[curId]->name() == BSPLINE_NAME)
             dynamic_cast<Bspline*>(curves[curId])->addK(1);
     break;
     case 2:
-        if (curves[curId]->name() == "Bspline")
+        if (curves[curId]->name() == BSPLINE_NAME)
             dynamic_cast<Bspline*>(curves[curId])->addK(-1);
     break;
     }
@@ -146,14 +157,18 @@ void menuBsplineFunc(int menu) {
 
 void keyFunc(unsigned char ch, int x, int y) {
     switch (ch) {
-        case 'N': case'n': menuPointFunc(1); break;
-        case 'P': case'p': menuPointFunc(2); break;
-        case 'A': case'a': menuPointFunc(3); break;
-        case 'R': case'r': menuPointFunc(4); break;
-        case 'I': case'i': menuPointFunc(5); break;
-        case 'M': case'm': menuPointFunc(6); break;
-        case '=': case'+': menuBsplineFunc(1); break;
-        case '_': case'-': menuBsplineFunc(2); break;
+        case 'N': case 'n': menuPointFunc(1); break;
+        case 'P': case 'p': menuPointFunc(2); break;
+        case 'A': case 'a': menuPointFunc(3); break;
+        case 'R': case 'r': menuPointFunc(4); break;
+        case 'I': case 'i': menuPointFunc(5); break;
+        case 'M': case 'm': menuPointFunc(6); break;
+        case 'L': case 'l': menuFunc(1); break;
+        case 'S': case 's': menuFunc(2); break;
+        case 'X': case 'x': menuIdFunc(1); break;
+        case 'V': case 'v': menuIdFunc(2); break;
+        case '=': case '+': menuBsplineFunc(1); break;
+        case '_': case '-': menuBsplineFunc(2); break;
     }
     refreshFunc();
 }
@@ -167,7 +182,7 @@ void keyKnotFunc(unsigned char ch, int x, int y) {
             break;
         case '\r':
             if (knotInput) knotInput = false;
-            if (curves[curId]->name() == "Bspline")
+            if (curves[curId]->name() == BSPLINE_NAME)
                 dynamic_cast<Bspline*>(curves[curId])->setKnot(knotPos, getFloat(knotString));
             break;
         case '\b':
@@ -184,7 +199,7 @@ void print(void* format, const string& str) {
         glutBitmapCharacter(format, str[i]);
 }
 
-void print(void* format, char str[]) {
+void print(void* format, const char str[]) {
     while (*str) glutBitmapCharacter(format, *str++);
 }
 
@@ -204,4 +219,43 @@ float getFloat(const string& str) {
     float ret;
     sscanf(str.c_str(), "%f", &ret);
     return ret;
+}
+
+void load(vector<Curve*>& curves) {
+    ifstream in(FILENAME);
+    while (curves.size()) {delete curves.back(); curves.pop_back();}
+    int t; in >> t;
+    for (int i = 0; i < t; i++) {
+        int n, k;
+        in >> n >> k;
+        if (2 <= k && k <= n) {
+            Bspline* c = new Bspline();
+            for (int i = 0; i < n; i++) {float x, y; in >> x >> y; c->add(Point2f(x, y));}
+            c->setK(k);
+            for (int i = 0; i < n + k; i++) {float u; in >> u; c->setKnot(i, u);}
+            curves.push_back(c);
+        } else {
+            Bezier* c = new Bezier();
+            for (int i = 0; i < n; i++) {float x, y; in >> x >> y; c->add(Point2f(x, y));}
+            curves.push_back(c);
+        }
+    }
+}
+
+void save(const vector<Curve*>& curves) {
+    ofstream out(FILENAME);
+    out << curves.size() << endl << endl;
+    for (int i = 0; i < curves.size(); i++) {
+        if (curves[i]->name() == BSPLINE_NAME) {
+            Bspline* c = dynamic_cast<Bspline*>(curves[i]);
+            out << c->size() << ' ' << c->getK() << endl;
+            for (int i = 0; i < c->size(); i++) {out << c->get(i).x << ' ' << c->get(i).y << endl;}
+            for (int i = 0; i < c->size() + c->getK(); i++) {out << c->getKnot(i) << ' ';}
+            out << endl << endl;
+        } else {
+            Curve* c = curves[i];
+            out << c->size() << ' ' << 0 << endl;
+            for (int i = 0; i < c->size(); i++) {out << c->get(i).x << ' ' << c->get(i).y << endl;}
+        }
+    }
 }

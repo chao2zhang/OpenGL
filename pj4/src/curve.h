@@ -21,15 +21,19 @@ public:
     virtual const string name() const = 0;
 };
 
+#define BEZIER_NAME "Bezier"
+
 class Bezier : public Curve {
 private:
     void show(float t) const;
 public:
     void show() const;
     const string name() const {
-        return "Bezier";
+        return BEZIER_NAME;
     }
 };
+
+#define BSPLINE_NAME "Bspline"
 
 class Bspline: public Curve {
 protected:
@@ -39,7 +43,7 @@ private:
     void addKnot();
     void show(float u) const;
 public:
-    Bspline():Curve(){setK(2);}
+    Bspline():Curve(), k(0){setK(2);}
     int knotSize() const;
     void add(const Point2f& p);
     void insert(int pos, const Point2f& p);
@@ -52,7 +56,7 @@ public:
     void addK(int dk);
     int getK() const;
     const string name() const {
-        return "Bspline";
+        return BSPLINE_NAME;
     }
 public:
     void show() const;
