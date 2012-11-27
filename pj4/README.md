@@ -100,33 +100,33 @@ Step-by-step Instruction
 
 3.Print instructions below:
 
-x #next curve
+	x #next curve
 
-`left click` on the second last knot, type `8.500` and `Enter`
+	`left click` on the second last knot, type `8.500` and `Enter`
 
-r #remove the 1st point in the 2nd curve
+	r #remove the 1st point in the 2nd curve
 
-`right click` on any area of main window, choose `curve->remove current curve`
+	`right click` on any area of main window, choose `curve->remove current curve`
 
-m #modify the point
+	m #modify the point
 
-`left click` on any specific point to modify current point
+	`left click` on any specific point to modify current point
 
-`right click` on any area of main window, choose `curve->add bezier`
+	`right click` on any area of main window, choose `curve->add bezier`
 
-x #next curve
+	x #next curve
 
-x #next curve
+	x #next curve
 
-a and `left click` #add a new point
+	a and `left click` #add a new point
 
-a and `left click` #add a new point
+	a and `left click` #add a new point
 
-a and `left click` #add a new point
+	a and `left click` #add a new point
 
-a and `left click` #add a new point
+	a and `left click` #add a new point
 
-s #save
+	s #save
 
 4.This would replace the file with contents like in `data_out.txt`, and the windows would be like `output.png`
 
