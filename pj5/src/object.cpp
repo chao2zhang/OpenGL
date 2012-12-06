@@ -5,11 +5,11 @@
 
 float iA = 0.2, iL = 1;
 Point3f kA(1, 1, 1), kD(1, 1, 1), kS(1, 1, 1);
-int bigN = 3;
-float bigK = 5;
-float kR = 0.3, kT = 0.5;
+int bigN = 5;
+float bigK = 10;
+float kR = 0.5, kT = 0.5;
 float eta = 1.5;
-Point3f lightSource(0.5, 0.5, 0.5);
+Point3f lightSource(0, 2, 0);
 
 using namespace std;
 
