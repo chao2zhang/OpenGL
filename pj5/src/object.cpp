@@ -9,7 +9,7 @@ int bigN = 5;
 float bigK = 10;
 float kR = 0.5, kT = 0.5;
 float eta = 1.5;
-Point3f lightSource(0, 2, 0);
+Point3f lightSource(0, 1, 0);
 
 using namespace std;
 
@@ -154,12 +154,17 @@ Point3f reflect(const Point3f& u, const Point3f& normal) {
     return u - 2 * normal * dot(normal, u);
 }
 
-Point3f phong(const Point3f& point, const Point3f& ref, const Point3f& normal) {
+Point3f phong(const Point3f& point, const Point3f& ref, const Point3f& normal, const vector<Primitive*>& primitives) {
     Point3f intensity = kA * iA;
     Point3f l = (lightSource - point).norm();
     Point3f v = (ref - point).norm();
     Point3f r = (2 * normal * dot(normal, l) - l).norm();
     Point3f diff;
+    Line line; line.start = point; line.u = (lightSource - point).norm();
+    Point3f result;
+    int resultId;
+    if (intersect(line, primitives, result, resultId))
+        return intensity;
     float productDiff = dot(l, normal);
     if (productDiff > 0) diff = productDiff * kD;
     Point3f spec;
@@ -202,11 +207,12 @@ Color3f light(const Line& line, const vector<Primitive*>& primitives, int depth)
     if (intersect(line, primitives, point, id)) {
         prim = primitives[id];
         normal = prim->normal(point);
-        Point3f ph = phong(point, line.start, normal);
+        Point3f ph = phong(point, line.start, normal, primitives);
         ret = prim->color * ph;
         Line refl;
         refl.start = point;
         refl.u = reflect(line.u, normal).norm();
+        refl.inside = line.inside;
         Color3f rf = light(refl, primitives, depth - 1);
         ret += rf * kR;
         if (prim->transparent) {

@@ -28,7 +28,9 @@ In case it doesn't work, I have submitted an executive file: proj5
 
 Overview of program
 ===================
-Implement Ray-tracing with reflection and refraction
+Implement Ray-tracing with reflection and refraction.
+
+Consider shadow-feeler.
 
 The whole scene includes 4 squares that are 4 of 6 surfaces of a cube, 1 tetrahedron, 2 spheres.
 

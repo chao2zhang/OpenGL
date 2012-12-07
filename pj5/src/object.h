@@ -86,7 +86,7 @@ Quadratic* newEllipsoid(const Point3f& center, float a, float b, float c);
 Quadratic* newSphere(const Point3f& center, float radius);
 Point3f refract(const Point3f& u, const Point3f& normal);
 Point3f reflect(const Point3f& u, const Point3f& normal);
-Point3f phong(const Point3f& point, const Point3f& ref, const Point3f& normal);
+Point3f phong(const Point3f& point, const Point3f& ref, const Point3f& normal, const vector<Primitive*>& primitives);
 bool intersect(const Line& line, const vector<Primitive*>& primitives, Point3f& result, int& resultId);
 Color3f light(const Line& line, const vector<Primitive*>& primitives, int depth);
 

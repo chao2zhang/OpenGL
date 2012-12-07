@@ -20,7 +20,7 @@ float canvas[WINDOW_SIZE * WINDOW_SIZE * 3];
 
 vector<Primitive*> objects;
 
-Point3f from(0, -1, 0);
+Point3f from(0, -3, 0);
 Point3f at(0, 0, 0);
 Point3f up(0, 0, 1);
 Point3f rv;
@@ -134,7 +134,7 @@ void init(int argc, char** argv) {
     Quadratic* s = newSphere(Point3f(-0.5, 1, -0.5), 0.4);
     s->color = Color3f(1, 1, 1);
     s->transparent = false;
-    Quadratic* s2 = newSphere(Point3f(0.5, 1.5, 0.5), 0.6);
+    Quadratic* s2 = newSphere(Point3f(1, 1.5, 1), 0.6);
     s2->color = Color3f(1, 1, 1);
     s2->transparent = true;
     Polygon* t = newTriangle(Point3f(-1, 2, 2),
@@ -164,7 +164,7 @@ void init(int argc, char** argv) {
     Polygon* p = newSquare(Point3f(5, 6, -4), Point3f(5, 6, 4),
                            Point3f(-5, 6, 4), Point3f(-5, 6, -4),
                            Point3f(0, -1, 0));
-    p->color = Color3f(1, 0.75, 0.25);
+    p->color = Color3f(1, 0.85, 0.25);
     p->transparent = false;
     Polygon* p2 = newSquare(Point3f(-5, -6, -4), Point3f(-5, 6, -4),
                            Point3f(-5, 6, 4), Point3f(-5, -6, 4),
